@@ -156,19 +156,3 @@ STA 2050H     ; Store result at memory address 2050H
 HLT           ; Halt execution
 ```
 
-## 🚢 Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions including:
-- Vercel (recommended)
-- Docker (self-hosted)
-- PostgreSQL setup for production
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-<div align="center">
-Built with ❤️ for education. Open for everyone.
-</div>
