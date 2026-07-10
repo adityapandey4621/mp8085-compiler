@@ -36,6 +36,7 @@ export interface State {
   memoryReads: number;
   memoryWrites: number;
   stackOps: number;
+  lastMemoryAccess: number | null;
 }
 
 export class Emulator8085 {
@@ -64,6 +65,7 @@ export class Emulator8085 {
       memoryReads: 0,
       memoryWrites: 0,
       stackOps: 0,
+      lastMemoryAccess: null,
     };
 
     // Initialize memory
@@ -109,6 +111,7 @@ export class Emulator8085 {
     this.state.memoryReads = 0;
     this.state.memoryWrites = 0;
     this.state.stackOps = 0;
+    this.state.lastMemoryAccess = null;
     this.state.memory.fill(0);
     this.state.ioPorts.clear();
   }
@@ -188,11 +191,13 @@ export class Emulator8085 {
 
   getMemory(address: number): number {
     this.state.memoryReads++;
+    this.state.lastMemoryAccess = address;
     return this.state.memory[address & 0xFFFF];
   }
 
   setMemory(address: number, value: number): void {
     this.state.memoryWrites++;
+    this.state.lastMemoryAccess = address;
     this.state.memory[address & 0xFFFF] = value & 0xFF;
   }
 

@@ -11,17 +11,29 @@ export interface AssembledInstruction {
   address: number;
   bytes: number[];
   source: string;
+  lineNumber: number;
+}
+
+export interface ParsedInstruction {
+  opcode: string;
+  args: string[];
+  address: number;
+  lineNumber: number;
 }
 
 export interface AssemblerResult {
   machineCode: Uint8Array;
   instructions: AssembledInstruction[];
   errors: string[];
+  warnings: any[]; // We use any to avoid circular dependency, or import AnalyzerWarning
 }
+
+import { Analyzer8085, AnalyzerWarning } from './analyzer';
 
 export class Assembler8085 {
   private labels: Map<string, number> = new Map();
   private instructions: AssembledInstruction[] = [];
+  private parsedInstructions: ParsedInstruction[] = [];
   private errors: string[] = [];
   private currentAddress: number = 0;
 
@@ -270,6 +282,12 @@ export class Assembler8085 {
 
           const inst = encoder(dummyOperands);
           if (inst) {
+            this.parsedInstructions.push({
+              opcode: instruction,
+              args: operands,
+              address: this.currentAddress,
+              lineNumber: i + 1
+            });
             this.currentAddress += inst.size;
           } else {
             this.errors.push(`Line ${i + 1}: Invalid operands for ${instruction}`);
@@ -304,7 +322,8 @@ export class Assembler8085 {
             this.instructions.push({
               address: this.currentAddress,
               bytes,
-              source: line.trim()
+              source: line.trim(),
+              lineNumber: i
             });
 
             this.currentAddress += inst.size;
@@ -315,7 +334,8 @@ export class Assembler8085 {
         this.instructions.push({
           address: this.currentAddress,
           bytes: [],
-          source: line.trim()
+          source: line.trim(),
+          lineNumber: i
         });
       }
     }
@@ -325,6 +345,7 @@ export class Assembler8085 {
   assemble(code: string): AssemblerResult {
     this.labels.clear();
     this.instructions = [];
+    this.parsedInstructions = [];
     this.errors = [];
     this.currentAddress = 0;
 
@@ -338,12 +359,17 @@ export class Assembler8085 {
       return {
         machineCode: new Uint8Array(0),
         instructions: [],
-        errors: this.errors
+        errors: this.errors,
+        warnings: []
       };
     }
 
     // Second pass - generate machine code
     this.secondPass(lines);
+    
+    // Analyze code
+    const labelsObj = Object.fromEntries(this.labels);
+    const warnings = Analyzer8085.analyze(this.parsedInstructions, labelsObj);
 
     // Create machine code array
     const totalSize = this.instructions.reduce((sum, inst) => sum + inst.bytes.length, 0);
@@ -360,7 +386,8 @@ export class Assembler8085 {
     return {
       machineCode,
       instructions: this.instructions,
-      errors: this.errors
+      errors: this.errors,
+      warnings
     };
   }
 

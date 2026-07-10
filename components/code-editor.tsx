@@ -50,10 +50,10 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
     })
   }
 
-  // Sync scrolling between layers
-  const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
-    const scrollTop = e.currentTarget.scrollTop
-    const scrollLeft = e.currentTarget.scrollLeft
+  const syncScroll = () => {
+    if (!textareaRef.current) return
+    const scrollTop = textareaRef.current.scrollTop
+    const scrollLeft = textareaRef.current.scrollLeft
     if (linesRef.current) linesRef.current.scrollTop = scrollTop
     if (bgRef.current) {
       bgRef.current.scrollTop = scrollTop
@@ -63,6 +63,11 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
       highlightRef.current.scrollTop = scrollTop
       highlightRef.current.scrollLeft = scrollLeft
     }
+  }
+
+  // Sync scrolling between layers
+  const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
+    syncScroll()
   }
 
   // Scroll to active line
@@ -76,6 +81,9 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
       const scrollPos = Math.max(0, targetScrollTop - viewHeight / 2 + lineHeight / 2)
       
       textareaRef.current.scrollTo({ top: scrollPos, behavior: 'smooth' })
+      // When smoothing, we need to sync continuously until animation is done
+      let syncInterval = setInterval(syncScroll, 20)
+      setTimeout(() => clearInterval(syncInterval), 500)
     }
   }, [activeLine, fontSize])
 
@@ -83,6 +91,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   const handleWheel = (e: React.WheelEvent) => {
     if (textareaRef.current) {
       textareaRef.current.scrollTop += e.deltaY
+      syncScroll()
     }
   }
 

@@ -1,22 +1,36 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { HardDrive } from "lucide-react"
 
 interface MemoryGridProps {
   memory: Uint8Array
   currentPC: number
+  lastMemoryAccess?: number | null
 }
 
-export default function MemoryGrid({ memory, currentPC }: MemoryGridProps) {
+export default function MemoryGrid({ memory, currentPC, lastMemoryAccess }: MemoryGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const activeRowRef = useRef<HTMLTableRowElement>(null)
+  const [baseAddress, setBaseAddress] = useState(0)
+  const [inputVal, setInputVal] = useState("0000")
   
   const colCount = 16
   
-  // Calculate a smaller safe 16-row window around the currentPC (256 bytes)
-  const pcRow = Math.floor(currentPC / colCount)
-  const startRow = Math.max(0, pcRow - 8)
+  // Sync baseAddress with lastMemoryAccess or PC during execution, but allow manual jumping
+  useEffect(() => {
+    if (lastMemoryAccess !== undefined && lastMemoryAccess !== null) {
+      setBaseAddress(lastMemoryAccess)
+    } else {
+      setBaseAddress(currentPC)
+    }
+  }, [currentPC, lastMemoryAccess])
+
+  // Calculate a safe 16-row window (256 bytes) around baseAddress
+  const activeAddress = (lastMemoryAccess !== undefined && lastMemoryAccess !== null) ? lastMemoryAccess : currentPC
+  const pcRow = Math.floor(activeAddress / colCount)
+  const baseRow = Math.floor(baseAddress / colCount)
+  const startRow = Math.max(0, baseRow - 8)
   const endRow = Math.min(4095, startRow + 15)
   
   const rows = []
@@ -38,9 +52,21 @@ export default function MemoryGrid({ memory, currentPC }: MemoryGridProps) {
     if (activeRowRef.current) {
       activeRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
     }
-  }, [currentPC])
+  }, [currentPC, lastMemoryAccess])
 
-  const isCurrentAddress = (addr: number) => addr === currentPC
+  const isCurrentAddress = (addr: number) => {
+    if (lastMemoryAccess !== undefined && lastMemoryAccess !== null) {
+       return addr === lastMemoryAccess
+    }
+    return addr === currentPC
+  }
+
+  const handleJump = () => {
+    const addr = parseInt(inputVal, 16)
+    if (!isNaN(addr) && addr >= 0 && addr <= 0xFFFF) {
+      setBaseAddress(addr)
+    }
+  }
 
   return (
     <div className="flex-1 rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden flex flex-col min-h-[300px]">
@@ -48,9 +74,22 @@ export default function MemoryGrid({ memory, currentPC }: MemoryGridProps) {
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
         <HardDrive className="w-4 h-4 text-amber-400" />
         <span className="text-sm font-medium text-gray-300">Memory Map</span>
-        <span className="ml-auto text-xs text-gray-500 font-mono">
-          PC: {currentPC.toString(16).toUpperCase().padStart(4, "0")}H
-        </span>
+        <div className="ml-auto flex items-center gap-2">
+          <input
+            type="text"
+            value={inputVal}
+            onChange={(e) => setInputVal(e.target.value.toUpperCase().replace(/[^0-9A-F]/g, '').slice(0, 4))}
+            onKeyDown={(e) => e.key === 'Enter' && handleJump()}
+            className="w-16 bg-white/[0.03] border border-white/10 rounded px-2 py-0.5 text-amber-400 font-mono text-xs focus:outline-none focus:border-amber-500/50"
+            placeholder="ADDR"
+          />
+          <button
+            onClick={handleJump}
+            className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded text-[10px] font-semibold transition-colors"
+          >
+            Go
+          </button>
+        </div>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-2 scroll-smooth">

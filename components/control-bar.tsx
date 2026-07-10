@@ -21,6 +21,7 @@ export default function ControlBar({ onAssemble, onRun, onStep, onStepBack, onRe
       <Button
         onClick={onAssemble}
         size="sm"
+        title="Assemble (Ctrl+Enter)"
         className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 gap-2 h-9 px-4 transition-all active:scale-95"
       >
         <Hammer className="w-4 h-4" />
@@ -29,6 +30,7 @@ export default function ControlBar({ onAssemble, onRun, onStep, onStepBack, onRe
       <Button
         onClick={onRun}
         size="sm"
+        title="Run (F5)"
         className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 gap-2 h-9 px-4 transition-all active:scale-95"
       >
         <Play className="w-4 h-4" />
@@ -37,6 +39,7 @@ export default function ControlBar({ onAssemble, onRun, onStep, onStepBack, onRe
       <Button
         onClick={onStep}
         size="sm"
+        title="Step (F10)"
         className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 gap-2 h-9 px-4 transition-all active:scale-95"
       >
         <StepForward className="w-4 h-4" />
@@ -45,6 +48,7 @@ export default function ControlBar({ onAssemble, onRun, onStep, onStepBack, onRe
       <Button
         onClick={onStepBack}
         size="sm"
+        title="Step Back (F9)"
         className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 gap-2 h-9 px-4 transition-all active:scale-95"
       >
         <StepBackIcon className="w-4 h-4" />
@@ -83,6 +87,7 @@ export default function ControlBar({ onAssemble, onRun, onStep, onStepBack, onRe
         onClick={onReset}
         size="sm"
         variant="ghost"
+        title="Reset (Ctrl+R)"
         className="text-gray-400 hover:text-white hover:bg-white/5 gap-2 h-9 px-4 transition-all active:scale-95"
       >
         <RotateCcw className="w-4 h-4" />

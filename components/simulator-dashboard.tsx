@@ -22,6 +22,7 @@ import WatchWindow from "./watch-window"
 import InstructionDecoder from "./instruction-decoder"
 import ProgramCounter from "./program-counter"
 import InterruptDisplay from "./interrupt-display"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSimulator } from "@/hooks/use-simulator"
 import { AIAssistantPanel } from "./ai-assistant-panel"
 import { useSession } from "next-auth/react"
@@ -62,11 +63,6 @@ export default function SimulatorDashboard() {
   // ─── Keyboard Shortcuts ──────────────────────────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger shortcuts if user is typing in editor or inputs
-      if (document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.tagName === 'INPUT') {
-        return;
-      }
-      
       if (e.key === 'F5') {
         e.preventDefault();
         runProgram();
@@ -225,11 +221,19 @@ export default function SimulatorDashboard() {
                 </ResizablePanel>
                 <ResizableHandle className="bg-white/5" />
                 <ResizablePanel defaultSize={30}>
-                  <div className="h-full p-2 flex flex-col gap-2">
-                    <ConsolePanel logs={consoleOutput} />
-                    <div className="flex-1 min-h-0">
-                      <InstructionHistory history={instructionHistory} />
-                    </div>
+                  <div className="h-full p-2 pt-0 flex flex-col">
+                    <Tabs defaultValue="console" className="flex-1 flex flex-col min-h-0">
+                      <TabsList className="w-full bg-white/5 border border-white/5 mb-2 shrink-0">
+                        <TabsTrigger value="console" className="flex-1 text-xs">Console</TabsTrigger>
+                        <TabsTrigger value="history" className="flex-1 text-xs">Instruction History</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="console" className="flex-1 min-h-0 m-0 data-[state=active]:flex flex-col">
+                        <ConsolePanel logs={consoleOutput} />
+                      </TabsContent>
+                      <TabsContent value="history" className="flex-1 min-h-0 m-0 data-[state=active]:flex flex-col">
+                        <InstructionHistory history={instructionHistory} />
+                      </TabsContent>
+                    </Tabs>
                   </div>
                 </ResizablePanel>
               </ResizablePanelGroup>
@@ -283,8 +287,8 @@ export default function SimulatorDashboard() {
                 <div className="shrink-0">
                   <OutputDisplay ledValue={ledValue} segmentValue={segmentValue} />
                 </div>
-                <div className="shrink-0">
-                  <ProgramCounter pc={registers.PC} onSetPC={setPC} />
+                <div className="shrink-0 flex-1">
+                  <MemoryGrid memory={emulatorState.memory || new Uint8Array(65536)} currentPC={currentPC} lastMemoryAccess={emulatorState.lastMemoryAccess} />
                 </div>
                 <div className="shrink-0">
                   <StackDisplay memory={emulatorState.memory || new Uint8Array(65536)} sp={registers.SP} />
@@ -297,9 +301,6 @@ export default function SimulatorDashboard() {
                     memoryWrites: emulatorState.memoryWrites || 0,
                     stackOps: emulatorState.stackOps || 0,
                   }} />
-                </div>
-                <div className="shrink-0 flex-1">
-                  <MemoryGrid memory={emulatorState.memory || new Uint8Array(65536)} currentPC={currentPC} />
                 </div>
               </div>
             </ResizablePanel>

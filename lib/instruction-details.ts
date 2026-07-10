@@ -111,6 +111,63 @@ export function decodeInstruction(memory: Uint8Array, pc: number): { hex: string
     meta = { opcode, mnemonic: `CALL ${read16()}`, length: 3, machineCycles: 5, tStates: 18, addressingMode: "Immediate/Register Indirect", description: "Call subroutine" };
   } else if (opcode === 0xC9) {
     meta = { opcode, mnemonic: `RET`, length: 1, machineCycles: 3, tStates: 10, addressingMode: "Register Indirect", description: "Return from subroutine" };
+  } else if ((opcode & 0xCF) === 0xC5) {
+    const rpId = (opcode >> 4) & 0x03;
+    const rp = rpId === 3 ? "PSW" : RP[rpId];
+    meta = { opcode, mnemonic: `PUSH ${rp}`, length: 1, machineCycles: 3, tStates: 11, addressingMode: "Register Indirect", description: `Push register pair ${rp} onto stack` };
+  } else if ((opcode & 0xCF) === 0xC1) {
+    const rpId = (opcode >> 4) & 0x03;
+    const rp = rpId === 3 ? "PSW" : RP[rpId];
+    meta = { opcode, mnemonic: `POP ${rp}`, length: 1, machineCycles: 3, tStates: 10, addressingMode: "Register Indirect", description: `Pop register pair ${rp} from stack` };
+  } else if ((opcode & 0xCF) === 0x03) {
+    const rp = RP[(opcode >> 4) & 0x03];
+    meta = { opcode, mnemonic: `INX ${rp}`, length: 1, machineCycles: 1, tStates: 6, addressingMode: "Register", description: `Increment register pair ${rp}` };
+  } else if ((opcode & 0xCF) === 0x0B) {
+    const rp = RP[(opcode >> 4) & 0x03];
+    meta = { opcode, mnemonic: `DCX ${rp}`, length: 1, machineCycles: 1, tStates: 6, addressingMode: "Register", description: `Decrement register pair ${rp}` };
+  } else if ((opcode & 0xC7) === 0x04) {
+    const dst = REGISTERS[(opcode >> 3) & 0x07];
+    const isMem = dst === "M";
+    meta = { opcode, mnemonic: `INR ${dst}`, length: 1, machineCycles: isMem ? 3 : 1, tStates: isMem ? 10 : 4, addressingMode: isMem ? "Register Indirect" : "Register", description: `Increment ${dst}` };
+  } else if ((opcode & 0xC7) === 0x05) {
+    const dst = REGISTERS[(opcode >> 3) & 0x07];
+    const isMem = dst === "M";
+    meta = { opcode, mnemonic: `DCR ${dst}`, length: 1, machineCycles: isMem ? 3 : 1, tStates: isMem ? 10 : 4, addressingMode: isMem ? "Register Indirect" : "Register", description: `Decrement ${dst}` };
+  } else if ((opcode & 0xF8) === 0xA0) {
+    const src = REGISTERS[opcode & 0x07];
+    const isMem = src === "M";
+    meta = { opcode, mnemonic: `ANA ${src}`, length: 1, machineCycles: isMem ? 2 : 1, tStates: isMem ? 7 : 4, addressingMode: isMem ? "Register Indirect" : "Register", description: `Logical AND ${src} with Accumulator` };
+  } else if ((opcode & 0xF8) === 0xA8) {
+    const src = REGISTERS[opcode & 0x07];
+    const isMem = src === "M";
+    meta = { opcode, mnemonic: `XRA ${src}`, length: 1, machineCycles: isMem ? 2 : 1, tStates: isMem ? 7 : 4, addressingMode: isMem ? "Register Indirect" : "Register", description: `Exclusive OR ${src} with Accumulator` };
+  } else if ((opcode & 0xF8) === 0xB0) {
+    const src = REGISTERS[opcode & 0x07];
+    const isMem = src === "M";
+    meta = { opcode, mnemonic: `ORA ${src}`, length: 1, machineCycles: isMem ? 2 : 1, tStates: isMem ? 7 : 4, addressingMode: isMem ? "Register Indirect" : "Register", description: `Logical OR ${src} with Accumulator` };
+  } else if ((opcode & 0xF8) === 0xB8) {
+    const src = REGISTERS[opcode & 0x07];
+    const isMem = src === "M";
+    meta = { opcode, mnemonic: `CMP ${src}`, length: 1, machineCycles: isMem ? 2 : 1, tStates: isMem ? 7 : 4, addressingMode: isMem ? "Register Indirect" : "Register", description: `Compare ${src} with Accumulator` };
+  } else if ((opcode & 0xC7) === 0xC6) {
+    const opId = (opcode >> 3) & 0x07;
+    const ops = ["ADI", "ACI", "SUI", "SBI", "ANI", "XRI", "ORI", "CPI"];
+    const op = ops[opId];
+    meta = { opcode, mnemonic: `${op} ${read8()}`, length: 2, machineCycles: 2, tStates: 7, addressingMode: "Immediate", description: `Immediate operation: ${op}` };
+  } else if (opcode === 0xEB) { meta = { opcode, mnemonic: "XCHG", length: 1, machineCycles: 1, tStates: 4, addressingMode: "Register", description: "Exchange H-L with D-E" };
+  } else if (opcode === 0xE3) { meta = { opcode, mnemonic: "XTHL", length: 1, machineCycles: 5, tStates: 18, addressingMode: "Register Indirect", description: "Exchange H-L with top of stack" };
+  } else if (opcode === 0xF9) { meta = { opcode, mnemonic: "SPHL", length: 1, machineCycles: 1, tStates: 5, addressingMode: "Register", description: "Copy H-L to Stack Pointer" };
+  } else if (opcode === 0xE9) { meta = { opcode, mnemonic: "PCHL", length: 1, machineCycles: 1, tStates: 5, addressingMode: "Register", description: "Copy H-L to Program Counter" };
+  } else if (opcode === 0x27) { meta = { opcode, mnemonic: "DAA", length: 1, machineCycles: 1, tStates: 4, addressingMode: "Implied", description: "Decimal Adjust Accumulator" };
+  } else if (opcode === 0x2F) { meta = { opcode, mnemonic: "CMA", length: 1, machineCycles: 1, tStates: 4, addressingMode: "Implied", description: "Complement Accumulator" };
+  } else if (opcode === 0x37) { meta = { opcode, mnemonic: "STC", length: 1, machineCycles: 1, tStates: 4, addressingMode: "Implied", description: "Set Carry Flag" };
+  } else if (opcode === 0x3F) { meta = { opcode, mnemonic: "CMC", length: 1, machineCycles: 1, tStates: 4, addressingMode: "Implied", description: "Complement Carry Flag" };
+  } else if (opcode === 0xD3) { meta = { opcode, mnemonic: `OUT ${read8()}`, length: 2, machineCycles: 3, tStates: 10, addressingMode: "Direct", description: "Output to port" };
+  } else if (opcode === 0xDB) { meta = { opcode, mnemonic: `IN ${read8()}`, length: 2, machineCycles: 3, tStates: 10, addressingMode: "Direct", description: "Input from port" };
+  } else if (opcode === 0x0A) { meta = { opcode, mnemonic: "LDAX B", length: 1, machineCycles: 2, tStates: 7, addressingMode: "Register Indirect", description: "Load A from address in BC" };
+  } else if (opcode === 0x1A) { meta = { opcode, mnemonic: "LDAX D", length: 1, machineCycles: 2, tStates: 7, addressingMode: "Register Indirect", description: "Load A from address in DE" };
+  } else if (opcode === 0x02) { meta = { opcode, mnemonic: "STAX B", length: 1, machineCycles: 2, tStates: 7, addressingMode: "Register Indirect", description: "Store A to address in BC" };
+  } else if (opcode === 0x12) { meta = { opcode, mnemonic: "STAX D", length: 1, machineCycles: 2, tStates: 7, addressingMode: "Register Indirect", description: "Store A to address in DE" };
   } else {
     // Basic fallback for other length instructions based on opcode ranges
     // This isn't perfect for all 256 but avoids crashing.

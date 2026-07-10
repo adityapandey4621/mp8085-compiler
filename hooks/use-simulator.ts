@@ -58,11 +58,17 @@ export function useSimulator() {
           ? `[ERROR] Assembly failed with ${result.errors.length} errors`
           : `[ASM] Program assembled successfully`,
         ...(result.errors.length > 0 ? result.errors.map((e: string) => `[ERROR] ${e}`) : []),
+        ...(result.warnings ? result.warnings.map((w: any) => `[WARNING] Line ${w.line > 0 ? w.line : '?'}: ${w.message}`) : []),
         `[ASM] ${result.instructions.length} instructions generated`
       ]
 
       setConsoleOutput(newConsoleOutput)
-      setCurrentLine(result.errors.length === 0 ? 0 : null)
+      
+      if (result.errors.length === 0 && result.instructions.length > 0) {
+        setCurrentLine(result.instructions[0].lineNumber)
+      } else {
+        setCurrentLine(null)
+      }
 
       if (result.errors.length === 0 && emulatorRef.current) {
         // Reset the emulator to clear previous state (registers, flags, memory)
@@ -140,11 +146,21 @@ export function useSimulator() {
       updateSimulatorState()
 
       // Track instruction history
+      const newPC = emulatorRef.current.getState().registers.PC
       if (assembledCode && assembledCode.instructions) {
-        const inst = assembledCode.instructions.find((i: any) => i.address === currentPC)
-        if (inst) {
+        const instBefore = assembledCode.instructions.find((i: any) => i.address === currentPC)
+        const nextInst = assembledCode.instructions.find((i: any) => i.address === newPC)
+        
+        if (nextInst) {
+           setCurrentLine(nextInst.lineNumber)
+        } else {
+           // Program halted or hit breakpoint
+           setCurrentLine(null)
+        }
+
+        if (instBefore) {
           setInstructionHistory(prev => {
-            const newHist = [...prev, inst]
+            const newHist = [...prev, instBefore]
             return newHist.slice(-50) // Keep last 50
           })
         }
