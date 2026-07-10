@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useState, useEffect } from "react"
-import { Play, FileCode } from "lucide-react"
+import { Play, FileCode, Bot } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useSettings } from "@/components/settings-provider"
 
@@ -24,7 +24,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   const bgRef = useRef<HTMLDivElement>(null)
   const highlightRef = useRef<HTMLDivElement>(null)
   const { data: session } = useSession()
-  const { fontSize, companionMode } = useSettings()
+  const { fontSize, companionMode, setCompanionMode } = useSettings()
   const [suggestion, setSuggestion] = useState<string | null>(null)
 
   // Identify guest user
@@ -34,20 +34,71 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
 
   const lines = code.split("\n")
 
-  // Simple syntax highlighting regex
-  const highlightSyntax = (line: string) => {
-    // Comments
-    if (line.trim().startsWith(";")) return <span className="text-gray-500">{line}</span>
+  // Smarter AI Prediction Logic
+  const predictNext = (currentLine: string, prevLine: string): string | null => {
+    const cur = currentLine.trim().toUpperCase()
+    const prev = prevLine.trim().toUpperCase()
+    
+    // Auto-complete mid-typing
+    if (cur.length >= 2) {
+      if ("MVI".startsWith(cur) && cur !== "MVI") return "MVI "
+      if ("LXI".startsWith(cur) && cur !== "LXI") return "LXI "
+      if ("MOV".startsWith(cur) && cur !== "MOV") return "MOV "
+      const match = OPCODES.find(op => op.startsWith(cur) && op !== cur)
+      if (match) return match
+    }
 
-    // Split by words but keep delimiters
-    const parts = line.split(/(\s+|;.*)/)
-    return parts.map((part, i) => {
-      if (part.trim().startsWith(";")) return <span key={i} className="text-gray-500">{part}</span>
-      if (OPCODES.includes(part.toUpperCase())) return <span key={i} className="text-blue-400 font-bold">{part}</span>
-      if (part.match(/^[0-9A-Fa-f]+H?$/)) return <span key={i} className="text-orange-400">{part}</span>
-      if (part.match(/^[A-Z]$/)) return <span key={i} className="text-yellow-400">{part}</span>
-      return <span key={i} className="text-gray-200">{part}</span>
-    })
+    // Contextual guessing based on previous instruction if current line is empty
+    if (cur === "") {
+      if (prev.startsWith("CMP") || prev.startsWith("CPI")) return "JZ "
+      if (prev.startsWith("LXI H")) return "MOV A, M"
+      if (prev.startsWith("PUSH")) {
+        const reg = prev.split(" ")[1]
+        if (reg) return `POP ${reg}`
+      }
+      if (prev.startsWith("MVI C")) return "DCR C"
+      if (prev.startsWith("DCR")) return "JNZ "
+      if (prev === "HLT") return "" // end of program
+    }
+
+    // Guess operands
+    if (cur === "MVI") return " A, 00H"
+    if (cur === "LXI") return " H, 2000H"
+    if (cur === "MOV") return " A, B"
+    if (cur === "MVI A") return ", 00H"
+    if (cur === "MVI B") return ", 00H"
+    if (cur === "MVI C") return ", 00H"
+    if (cur === "ADD") return " B"
+    if (cur === "SUB") return " B"
+    if (cur === "CMP") return " M"
+    
+    return null
+  }
+
+  // Simple syntax highlighting regex
+  const highlightSyntax = (line: string, lineIndex: number) => {
+    let content = []
+    
+    if (line.trim().startsWith(";")) {
+      content.push(<span key={0} className="text-gray-500">{line}</span>)
+    } else {
+      const parts = line.split(/(\s+|;.*)/)
+      content = parts.map((part, i) => {
+        if (part.trim().startsWith(";")) return <span key={i} className="text-gray-500">{part}</span>
+        if (OPCODES.includes(part.toUpperCase())) return <span key={i} className="text-blue-400 font-bold">{part}</span>
+        if (part.match(/^[0-9A-Fa-f]+H?$/)) return <span key={i} className="text-orange-400">{part}</span>
+        if (part.match(/^[A-Z]$/)) return <span key={i} className="text-yellow-400">{part}</span>
+        return <span key={i} className="text-gray-200">{part}</span>
+      })
+    }
+
+    // Add Ghost Text if on current line
+    const currentCursorLine = code.slice(0, textareaRef.current?.selectionStart || 0).split("\n").length - 1
+    if (enableCompanion && suggestion && lineIndex === currentCursorLine) {
+      content.push(<span key="ghost" className="text-gray-500 opacity-50 italic pointer-events-none">{suggestion}</span>)
+    }
+
+    return content
   }
 
   const syncScroll = () => {
@@ -99,41 +150,59 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
     const newCode = e.target.value
     setCode(newCode)
 
-    if (!enableCompanion) return
+    if (!enableCompanion) {
+      setSuggestion(null)
+      return
+    }
 
-    // Check for suggestion
     const cursorPosition = e.target.selectionStart
     const textBeforeCursor = newCode.slice(0, cursorPosition)
-    const lines = textBeforeCursor.split("\n")
-    const currentLine = lines[lines.length - 1]
-    const lastWord = currentLine.split(/\s+/).pop()?.toUpperCase()
+    const linesArr = textBeforeCursor.split("\n")
+    const currentLine = linesArr[linesArr.length - 1]
+    const prevLine = linesArr.length > 1 ? linesArr[linesArr.length - 2] : ""
 
-    if (lastWord && lastWord.length >= 2) {
-      const match = OPCODES.find(op => op.startsWith(lastWord) && op !== lastWord)
-      setSuggestion(match || null)
-    } else {
+    // Don't suggest inside comments
+    if (currentLine.includes(";")) {
       setSuggestion(null)
+      return
     }
+
+    const nextPrediction = predictNext(currentLine, prevLine)
+    setSuggestion(nextPrediction)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (suggestion && (e.key === "Tab" || e.key === "Enter")) {
+    if (suggestion && (e.key === "Tab" || e.key === "ArrowRight")) {
       e.preventDefault()
       const cursorPosition = textareaRef.current?.selectionStart || 0
+      
       const textBeforeCursor = code.slice(0, cursorPosition)
       const textAfterCursor = code.slice(cursorPosition)
-      const lines = textBeforeCursor.split("\n")
-      const currentLine = lines[lines.length - 1]
-      const lastWord = currentLine.split(/\s+/).pop() || ""
 
-      const newText = textBeforeCursor.slice(0, -lastWord.length) + suggestion + textAfterCursor
+      let insertedText = suggestion
+      // If the suggestion is a full instruction replacement (like mid-typing autocomplete)
+      const linesArr = textBeforeCursor.split("\n")
+      const currentLine = linesArr[linesArr.length - 1]
+      
+      let newText = ""
+      
+      if (currentLine.trim().length > 0 && !suggestion.startsWith(" ") && !suggestion.startsWith(",")) {
+        // Autocompleting a partially typed word
+        const lastWord = currentLine.split(/\s+/).pop() || ""
+        newText = textBeforeCursor.slice(0, -lastWord.length) + suggestion + textAfterCursor
+        insertedText = suggestion
+      } else {
+        // Appending to the line
+        newText = textBeforeCursor + suggestion + textAfterCursor
+      }
+
       setCode(newText)
       setSuggestion(null)
 
-      // Move cursor after inserted word
+      // Move cursor
       setTimeout(() => {
         if (textareaRef.current) {
-          const newCursorPos = cursorPosition - lastWord.length + suggestion.length
+          const newCursorPos = newText.length - textAfterCursor.length
           textareaRef.current.selectionStart = newCursorPos
           textareaRef.current.selectionEnd = newCursorPos
         }
@@ -144,9 +213,23 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   return (
     <div className="h-full w-full rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
-        <FileCode className="w-4 h-4 text-blue-400" />
-        <span className="text-sm font-medium text-gray-300">program.asm</span>
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+        <div className="flex items-center gap-2">
+          <FileCode className="w-4 h-4 text-blue-400" />
+          <span className="text-sm font-medium text-gray-300">program.asm</span>
+        </div>
+        
+        {/* Companion Mode Toggle */}
+        <div 
+          className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer transition-colors ${
+            companionMode ? "bg-purple-500/20 text-purple-400" : "bg-gray-800 text-gray-500 hover:bg-gray-700 hover:text-gray-400"
+          }`}
+          onClick={() => setCompanionMode(!companionMode)}
+          title={isGuest ? "Sign in to use Companion Mode" : "Toggle AI Companion Mode"}
+        >
+          <Bot className="w-3.5 h-3.5" />
+          <span className="text-xs font-semibold select-none">Companion AI</span>
+        </div>
       </div>
 
       {/* Editor */}
@@ -192,7 +275,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
             style={{ fontSize: `${fontSize}px`, lineHeight: '1.5em' }}
           >
             {lines.map((line, i) => (
-              <div key={i} className="h-[1.5em]">{highlightSyntax(line)}</div>
+              <div key={i} className="h-[1.5em]">{highlightSyntax(line, i)}</div>
             ))}
           </div>
 
@@ -209,12 +292,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
             placeholder="; Write your 8085 assembly code here..."
           />
 
-          {/* Suggestion Tooltip */}
-          {suggestion && (
-            <div className="absolute bottom-4 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg animate-in fade-in slide-in-from-bottom-2">
-              Press Tab to complete: <span className="font-bold">{suggestion}</span>
-            </div>
-          )}
+
         </div>
       </div>
     </div>

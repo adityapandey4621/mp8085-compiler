@@ -6,19 +6,9 @@ import { decodeInstruction } from "@/lib/instruction-details"
 interface InstructionDecoderProps {
   memory: Uint8Array
   pc: number
-  isAssembled: boolean
 }
 
-export default function InstructionDecoder({ memory, pc, isAssembled }: InstructionDecoderProps) {
-  if (!isAssembled) {
-    return (
-      <div className="shrink-0 h-[140px] rounded-lg bg-[#0a0a0f] border border-white/5 flex flex-col items-center justify-center text-white/30 text-xs">
-        <Cpu className="w-6 h-6 mb-2 opacity-50" />
-        <span>Assemble & step to decode instructions</span>
-      </div>
-    )
-  }
-
+export default function InstructionDecoder({ memory, pc }: InstructionDecoderProps) {
   const { hex, meta } = decodeInstruction(memory, pc)
 
   return (

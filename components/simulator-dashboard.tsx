@@ -146,7 +146,7 @@ export default function SimulatorDashboard() {
     if (!session) { toast.error("Please sign in to save your code"); return }
     if (!code.trim()) { toast.error("Cannot save empty code"); return }
     try {
-      const response = await fetch("/api/code", {
+      const response = await fetch("/api/programs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: "My 8085 Program", code }),
@@ -160,6 +160,11 @@ export default function SimulatorDashboard() {
     } catch {
       toast.error("Failed to save code")
     }
+  }
+
+  const handleOpen = (content: string) => {
+    setCode(content)
+    toast.success("File opened successfully!")
   }
 
   const handleShare = async () => {
@@ -202,8 +207,9 @@ export default function SimulatorDashboard() {
           onStep={handleStep}
           onStepBack={stepBack}
           onReset={handleReset}
-          onClear={handleClear}
+          onClear={clearCode}
           onSave={handleSave}
+          onOpen={handleOpen}
           onShare={handleShare}
           onDownload={handleDownload}
         />
@@ -261,7 +267,6 @@ export default function SimulatorDashboard() {
                   <InstructionDecoder 
                     memory={emulatorState.memory || new Uint8Array(65536)} 
                     pc={currentPC}
-                    isAssembled={isAssembled}
                   />
                 </div>
                 <div className="shrink-0">

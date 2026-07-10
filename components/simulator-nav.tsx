@@ -29,17 +29,7 @@ export default function SimulatorNav() {
           <span className="font-semibold tracking-tight">MP8085</span>
         </Link>
 
-        {/* Center Actions */}
-        <div className="hidden md:flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white gap-2 h-8">
-            <FolderOpen className="w-4 h-4" />
-            Open
-          </Button>
-          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white gap-2 h-8">
-            <Save className="w-4 h-4" />
-            Save
-          </Button>
-        </div>
+
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
