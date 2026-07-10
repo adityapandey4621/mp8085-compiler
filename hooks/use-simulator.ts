@@ -15,6 +15,8 @@ export function useSimulator() {
   const [isAssembled, setIsAssembled] = useState<boolean>(false)
   const [currentLine, setCurrentLine] = useState<number | null>(null)
   const [breakpoints, setBreakpoints] = useState<Set<number>>(new Set())
+  const [history, setHistory] = useState<any[]>([])
+  const [instructionHistory, setInstructionHistory] = useState<any[]>([])
   const [consoleOutput, setConsoleOutput] = useState<string[]>([
     '[INFO] 8085 Simulator initialized',
     '[INFO] Ready to load program'
@@ -68,6 +70,8 @@ export function useSimulator() {
         // Load the program into the emulator
         emulatorRef.current.loadProgram(result.machineCode)
         updateSimulatorState()
+        setHistory([])
+        setInstructionHistory([])
       }
     } catch (error) {
       const newConsoleOutput = [
@@ -127,8 +131,24 @@ export function useSimulator() {
     if (!emulatorRef.current) return
 
     try {
+      const stateBefore = emulatorRef.current.getState()
+      setHistory(prev => [...prev, stateBefore])
+      
+      const currentPC = stateBefore.registers.PC
+      
       const cycles = emulatorRef.current.step()
       updateSimulatorState()
+
+      // Track instruction history
+      if (assembledCode && assembledCode.instructions) {
+        const inst = assembledCode.instructions.find((i: any) => i.address === currentPC)
+        if (inst) {
+          setInstructionHistory(prev => {
+            const newHist = [...prev, inst]
+            return newHist.slice(-50) // Keep last 50
+          })
+        }
+      }
 
       setConsoleOutput([...consoleOutput, `[STEP] Executed instruction in ${cycles} cycles`])
     } catch (error) {
@@ -139,6 +159,38 @@ export function useSimulator() {
       setConsoleOutput(newConsoleOutput)
     }
   }, [isAssembled, consoleOutput, updateSimulatorState])
+
+  // Step backwards
+  const stepBack = useCallback(() => {
+    if (!isAssembled) return
+    if (!emulatorRef.current) return
+    
+    setHistory(prev => {
+      if (prev.length === 0) {
+        setConsoleOutput([...consoleOutput, '[INFO] No more history to step back'])
+        return prev
+      }
+      const newHistory = [...prev]
+      const prevState = newHistory.pop()
+      if (prevState) {
+        emulatorRef.current!.setState(prevState)
+        updateSimulatorState()
+        setConsoleOutput([...consoleOutput, `[STEP BACK] Reverted one instruction`])
+        setInstructionHistory(prev => prev.slice(0, -1))
+      }
+      return newHistory
+    })
+  }, [isAssembled, consoleOutput, updateSimulatorState])
+
+  // Skip to a particular location (set PC)
+  const setPC = useCallback((address: number) => {
+    if (!emulatorRef.current) return
+    const currentState = emulatorRef.current.getState()
+    currentState.registers.PC = address & 0xFFFF
+    emulatorRef.current.setState(currentState)
+    updateSimulatorState()
+    setConsoleOutput([...consoleOutput, `[PC] Jumped to ${address.toString(16).toUpperCase().padStart(4, "0")}`])
+  }, [consoleOutput, updateSimulatorState])
 
   // Reset the simulator
   const resetSimulator = useCallback(() => {
@@ -151,6 +203,8 @@ export function useSimulator() {
     setIsAssembled(false)
     setCurrentLine(null)
     setAssembledCode(null)
+    setHistory([])
+    setInstructionHistory([])
     setConsoleOutput([...consoleOutput, '[RESET] Simulator reset'])
   }, [consoleOutput, updateSimulatorState])
 
@@ -192,12 +246,15 @@ export function useSimulator() {
     currentLine,
     breakpoints,
     consoleOutput,
+    instructionHistory,
     assembleCode,
     runProgram,
     stepProgram,
+    stepBack,
     resetSimulator,
     clearCode,
     setBreakpoint,
+    setPC,
     addToConsole,
   }
 }

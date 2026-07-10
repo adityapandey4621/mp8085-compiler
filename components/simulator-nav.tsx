@@ -69,8 +69,11 @@ export default function SimulatorNav() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-[#0a0a0f] border-white/10">
-                <div className="px-2 py-1.5 text-sm text-gray-400 truncate">
-                  {session.user?.email}
+                <div className="px-2 py-1.5 text-sm truncate">
+                  <div className="text-gray-200 font-medium">{session.user?.name || "User"}</div>
+                  <div className="text-gray-500 text-xs">
+                    {session.user?.username ? `@${session.user.username}` : session.user?.email}
+                  </div>
                 </div>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <Link href="/profile">
@@ -97,15 +100,16 @@ export default function SimulatorNav() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              variant="default"
-              size="sm"
-              className="h-8 bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => signIn("google")}
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In
-            </Button>
+            <Link href="/auth/signin">
+              <Button
+                variant="default"
+                size="sm"
+                className="h-8 bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-105"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            </Link>
           )}
         </div>
         <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />

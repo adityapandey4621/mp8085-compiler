@@ -9,12 +9,15 @@ interface FlagDisplayProps {
 }
 
 const flagDescriptions: Record<string, string> = {
-  Z: "Zero Flag - Set when result is zero",
   S: "Sign Flag - Set when result is negative",
-  CY: "Carry Flag - Set when arithmetic overflow occurs",
-  P: "Parity Flag - Set when result has even parity",
+  Z: "Zero Flag - Set when result is zero",
   AC: "Auxiliary Carry - Set on carry from bit 3 to 4",
+  P: "Parity Flag - Set when result has even parity",
+  CY: "Carry Flag - Set when arithmetic overflow occurs",
 }
+
+// Ensure the specific order for rendering
+const flagOrder = ["S", "Z", "AC", "P", "CY"]
 
 export default function FlagDisplay({ flags }: FlagDisplayProps) {
   const [changedFlags, setChangedFlags] = useState<Set<string>>(new Set())
@@ -39,39 +42,44 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
         <Flag className="w-4 h-4 text-emerald-400" />
-        <span className="text-sm font-medium text-gray-300">Status Flags</span>
+        <span className="text-sm font-medium text-gray-300">Flag Register</span>
       </div>
 
       <div className="p-4">
         <TooltipProvider>
           <div className="flex items-center justify-between gap-2">
-            {Object.entries(flags).map(([flag, value]) => (
-              <Tooltip key={flag}>
-                <TooltipTrigger asChild>
-                  <div
-                    className={`flex-1 p-2 rounded-lg border text-center cursor-help transition-all duration-300 ${
-                      changedFlags.has(flag)
-                        ? value
-                          ? "bg-emerald-500/30 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.4)]"
-                          : "bg-gray-500/20 border-gray-500/30"
-                        : value
-                          ? "bg-emerald-500/20 border-emerald-500/30"
-                          : "bg-white/[0.02] border-white/5"
-                    }`}
-                  >
-                    <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{flag}</div>
+            {flagOrder.map((flag) => {
+              const value = flags[flag]
+              return (
+                <Tooltip key={flag}>
+                  <TooltipTrigger asChild>
                     <div
-                      className={`w-3 h-3 rounded-full mx-auto transition-all duration-300 ${
-                        value ? "bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-gray-600"
+                      className={`flex-1 p-2 rounded-lg border text-center cursor-help transition-all duration-300 ${
+                        changedFlags.has(flag)
+                          ? value
+                            ? "bg-emerald-500/30 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+                            : "bg-gray-500/20 border-gray-500/30"
+                          : value
+                            ? "bg-emerald-500/20 border-emerald-500/30"
+                            : "bg-white/[0.02] border-white/5"
                       }`}
-                    />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="bg-[#0a0a0f] border-white/10 text-xs max-w-[200px]">
-                  {flagDescriptions[flag]}
-                </TooltipContent>
-              </Tooltip>
-            ))}
+                    >
+                      <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{flag}</div>
+                      <div
+                        className={`font-mono text-lg font-semibold transition-colors ${
+                          value ? "text-emerald-400" : "text-white/40"
+                        }`}
+                      >
+                        {value ? "1" : "0"}
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="bg-[#0a0a0f] border-white/10 text-xs max-w-[200px]">
+                    {flagDescriptions[flag]}
+                  </TooltipContent>
+                </Tooltip>
+              )
+            })}
           </div>
         </TooltipProvider>
       </div>

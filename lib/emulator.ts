@@ -32,6 +32,10 @@ export interface State {
   pendingInterrupts: number; // Bit 0: RST 5.5, Bit 1: RST 6.5, Bit 2: RST 7.5, Bit 3: TRAP, Bit 4: INTR
   serialOutput: number; // SOD bit
   serialInput: number; // SID bit
+  instructionsExecuted: number;
+  memoryReads: number;
+  memoryWrites: number;
+  stackOps: number;
 }
 
 export class Emulator8085 {
@@ -56,6 +60,10 @@ export class Emulator8085 {
       pendingInterrupts: 0,
       serialOutput: 0,
       serialInput: 0,
+      instructionsExecuted: 0,
+      memoryReads: 0,
+      memoryWrites: 0,
+      stackOps: 0,
     };
 
     // Initialize memory
@@ -63,7 +71,23 @@ export class Emulator8085 {
   }
 
   getState(): State {
-    return { ...this.state };
+    return { 
+      ...this.state,
+      registers: { ...this.state.registers },
+      flags: { ...this.state.flags },
+      memory: new Uint8Array(this.state.memory),
+      ioPorts: new Map(this.state.ioPorts)
+    };
+  }
+
+  setState(newState: State): void {
+    this.state = {
+      ...newState,
+      registers: { ...newState.registers },
+      flags: { ...newState.flags },
+      memory: new Uint8Array(newState.memory),
+      ioPorts: new Map(newState.ioPorts)
+    };
   }
 
   reset(): void {
@@ -81,6 +105,10 @@ export class Emulator8085 {
     this.state.pendingInterrupts = 0;
     this.state.serialOutput = 0;
     this.state.serialInput = 0;
+    this.state.instructionsExecuted = 0;
+    this.state.memoryReads = 0;
+    this.state.memoryWrites = 0;
+    this.state.stackOps = 0;
     this.state.memory.fill(0);
     this.state.ioPorts.clear();
   }
@@ -159,10 +187,12 @@ export class Emulator8085 {
   }
 
   getMemory(address: number): number {
+    this.state.memoryReads++;
     return this.state.memory[address & 0xFFFF];
   }
 
   setMemory(address: number, value: number): void {
+    this.state.memoryWrites++;
     this.state.memory[address & 0xFFFF] = value & 0xFF;
   }
 
@@ -175,6 +205,7 @@ export class Emulator8085 {
   }
 
   push(value: number): void {
+    this.state.stackOps++;
     const sp = (this.state.registers.SP - 1) & 0xFFFF;
     this.state.registers.SP = sp;
     this.setMemory(sp, (value >> 8) & 0xFF);
@@ -185,6 +216,7 @@ export class Emulator8085 {
   }
 
   pop(): number {
+    this.state.stackOps++;
     const sp = this.state.registers.SP;
     const low = this.getMemory(sp);
     const high = this.getMemory(sp + 1);
@@ -305,6 +337,7 @@ export class Emulator8085 {
     let cycles = 0;
 
     this.state.registers.PC = (this.state.registers.PC + 1) & 0xFFFF;
+    this.state.instructionsExecuted++;
 
     switch (opcode) {
       // MOV Instructions

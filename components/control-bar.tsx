@@ -1,12 +1,13 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Play, StepForward, RotateCcw, Trash2, Hammer, Save, Share2, Download } from "lucide-react"
+import { Play, StepForward, StepBack as StepBackIcon, RotateCcw, Trash2, Hammer, Save, Share2, Download } from "lucide-react"
 
 interface ControlBarProps {
   onAssemble: () => void
   onRun: () => void
   onStep: () => void
+  onStepBack: () => void
   onReset: () => void
   onClear: () => void
   onSave: () => void
@@ -14,7 +15,7 @@ interface ControlBarProps {
   onDownload: () => void
 }
 
-export default function ControlBar({ onAssemble, onRun, onStep, onReset, onClear, onSave, onShare, onDownload }: ControlBarProps) {
+export default function ControlBar({ onAssemble, onRun, onStep, onStepBack, onReset, onClear, onSave, onShare, onDownload }: ControlBarProps) {
   return (
     <div className="flex items-center gap-2 p-2 rounded-lg bg-[#0a0a0f] border border-white/5">
       <Button
@@ -40,6 +41,14 @@ export default function ControlBar({ onAssemble, onRun, onStep, onReset, onClear
       >
         <StepForward className="w-4 h-4" />
         Step
+      </Button>
+      <Button
+        onClick={onStepBack}
+        size="sm"
+        className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 gap-2 h-9 px-4 transition-all active:scale-95"
+      >
+        <StepBackIcon className="w-4 h-4" />
+        Step Back
       </Button>
       <div className="w-px h-6 bg-white/10 mx-1" />
       <Button
