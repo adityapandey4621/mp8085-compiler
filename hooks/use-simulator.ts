@@ -103,7 +103,31 @@ export function useSimulator() {
     // Run in a timeout to allow UI to update
     setTimeout(() => {
       try {
-        const cycles = emulatorRef.current!.run()
+        const result = emulatorRef.current!.run()
+        const cycles = result.cycles
+        const trace = result.trace
+        
+        if (assembledCode && assembledCode.instructions) {
+          const executedInstructions = trace.map(pc => 
+            assembledCode.instructions.find((i: any) => i.address === pc)
+          ).filter(Boolean);
+          
+          if (executedInstructions.length > 0) {
+            setInstructionHistory(prev => {
+              const newHist = [...prev, ...executedInstructions];
+              return newHist.slice(-50); // Keep last 50
+            });
+          }
+          
+          const newPC = emulatorRef.current!.getState().registers.PC;
+          const nextInst = assembledCode.instructions.find((i: any) => i.address === newPC);
+          if (nextInst && !emulatorRef.current!.getState().halted) {
+             setCurrentLine(nextInst.lineNumber);
+          } else {
+             setCurrentLine(null);
+          }
+        }
+        
         updateSimulatorState()
 
         const newConsoleOutput = [

@@ -926,17 +926,19 @@ export class Emulator8085 {
     this.setRegisterPair(rp, (high << 8) | low);
   }
 
-  run(): number {
+  run(): { cycles: number, trace: number[] } {
     let totalCycles = 0;
     const maxInstructions = 10000;
     let instructionCount = 0;
+    const trace: number[] = [];
 
     while (!this.state.halted && !this.hasBreakpoint() && instructionCount < maxInstructions) {
+      trace.push(this.state.registers.PC);
       totalCycles += this.step();
       instructionCount++;
       if (this.hasBreakpoint()) break;
     }
-    return totalCycles;
+    return { cycles: totalCycles, trace };
   }
 
   loadProgram(program: Uint8Array, startAddress: number = 0x0000): void {

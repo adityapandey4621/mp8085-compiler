@@ -14,9 +14,17 @@ interface AIAssistantPanelProps {
   code?: string
   registers?: any
   flags?: any
+  onApplyCode?: (code: string) => void
+  consoleOutput?: string[]
+  assembledCode?: any
+  isRunning?: boolean
+  isAssembled?: boolean
 }
 
-export function AIAssistantPanel({ code, registers, flags }: AIAssistantPanelProps) {
+export function AIAssistantPanel({ 
+  code, registers, flags, onApplyCode, 
+  consoleOutput, assembledCode, isRunning, isAssembled 
+}: AIAssistantPanelProps) {
   const { data: session } = useSession()
   // @ts-ignore
   const isGuest = session?.user?.id === "guest-user"
@@ -31,6 +39,7 @@ export function AIAssistantPanel({ code, registers, flags }: AIAssistantPanelPro
     addTokens,
     resetSession,
     canUseAssistant,
+    statusMessage,
   } = useAIAssistant();
 
   const [inputValue, setInputValue] = useState('');
@@ -58,7 +67,11 @@ export function AIAssistantPanel({ code, registers, flags }: AIAssistantPanelPro
     await startSession(message, assistantType, {
       code: code || '',
       registers: registers || {},
-      flags: flags || {}
+      flags: flags || {},
+      consoleOutput,
+      assembledCode,
+      isRunning,
+      isAssembled
     });
   };
 
@@ -199,8 +212,42 @@ export function AIAssistantPanel({ code, registers, flags }: AIAssistantPanelPro
                     : 'bg-gray-100 text-gray-900'
                     }`}
                 >
-                  <p className="break-words">{msg.content}</p>
-                  <span className="text-xs opacity-60">
+                  {msg.content.includes('```assembly') ? (
+                    <div className="text-sm">
+                      {msg.content.split('```assembly').map((part, i) => {
+                        if (i === 0) return <p key={i} className="break-words whitespace-pre-wrap">{part}</p>;
+                        
+                        const codePart = part.split('```');
+                        const codeStr = codePart[0].replace(/^\n/, '').trimEnd();
+                        const rest = codePart[1] || '';
+                        
+                        return (
+                          <div key={i} className="my-2">
+                            <div className="border border-purple-200 rounded-md bg-[#0a0a0f] text-gray-200 overflow-hidden text-left relative">
+                              <div className="bg-white/[0.05] border-b border-white/10 px-3 py-1.5 text-[10px] text-gray-400 flex justify-between items-center uppercase tracking-wider font-semibold">
+                                <span>Assembly</span>
+                                {onApplyCode && (
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-6 px-2 text-[10px] hover:bg-white/10 hover:text-white transition-colors"
+                                    onClick={() => onApplyCode(codeStr)}
+                                  >
+                                    Apply to Editor
+                                  </Button>
+                                )}
+                              </div>
+                              <pre className="p-3 overflow-x-auto text-[11px] font-mono leading-relaxed">{codeStr}</pre>
+                            </div>
+                            {rest && <p className="break-words whitespace-pre-wrap mt-2">{rest}</p>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="break-words whitespace-pre-wrap">{msg.content}</p>
+                  )}
+                  <span className="text-xs opacity-60 mt-1 block text-right">
                     {new Date(msg.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
@@ -209,12 +256,13 @@ export function AIAssistantPanel({ code, registers, flags }: AIAssistantPanelPro
 
             {loading && (
               <div className="flex gap-2">
-                <div className="rounded-lg bg-gray-100 px-3 py-2">
+                <div className="rounded-lg bg-gray-100 px-3 py-2 flex items-center gap-2">
                   <div className="flex gap-1">
                     <div className="h-2 w-2 animate-bounce rounded-full bg-gray-500" />
                     <div className="animation-delay-100 h-2 w-2 animate-bounce rounded-full bg-gray-500" />
                     <div className="animation-delay-200 h-2 w-2 animate-bounce rounded-full bg-gray-500" />
                   </div>
+                  {statusMessage && <span className="text-xs text-gray-500 italic ml-2">{statusMessage}</span>}
                 </div>
               </div>
             )}

@@ -17,8 +17,8 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
 
-    if (user.aiUsage && user.aiUsage.count >= 1) {
-        return NextResponse.json({ error: "AI usage limit reached (1 request per email)" }, { status: 403 })
+    if (user.aiUsage && user.aiUsage.count >= 100) {
+        return NextResponse.json({ error: "AI usage limit reached (100 requests per email)" }, { status: 403 })
     }
 
     const body = await req.json()
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

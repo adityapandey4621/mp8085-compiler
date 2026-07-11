@@ -326,7 +326,16 @@ export default function SimulatorDashboard() {
               <DialogTitle>AI Assistant</DialogTitle>
             </DialogHeader>
             <div className="flex-1 overflow-hidden">
-              <AIAssistantPanel code={code} registers={registers} flags={flags} />
+              <AIAssistantPanel 
+                code={code} 
+                onApplyCode={setCode} 
+                registers={registers} 
+                flags={flags}
+                consoleOutput={consoleOutput}
+                assembledCode={assembledCode}
+                isRunning={isRunning}
+                isAssembled={isAssembled}
+              />
             </div>
           </DialogContent>
         </Dialog>

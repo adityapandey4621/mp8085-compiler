@@ -15,50 +15,49 @@ export interface AIAssistantState {
   conversation: Message[];
   loading: boolean;
   error: string | null;
+  statusMessage?: string | null;
 }
 
 export interface AIContext {
   code: string;
   registers: any;
   flags: any;
+  consoleOutput?: string[];
+  assembledCode?: any;
+  isRunning?: boolean;
+  isAssembled?: boolean;
 }
 
 const AI_INSTRUCTIONS = {
-  GUIDED_HELP: `You are an 8085 microprocessor assembly language instructor. Help the user write 8085 assembly code step by step.
-1. Understand what they want to accomplish
-2. Ask clarifying questions if needed
-3. Guide them through the logic and register usage
-4. Provide correct opcodes and addressing modes
-5. Explain each instruction's function and effect on flags
-6. Point out common mistakes and best practices
+  GUIDED_HELP: `You are an Elite 10x 8085 Microprocessor Engineer and an exceptional AI Tutor. 
+1. Your goal is to be profoundly self-sufficient, effortlessly grasping the user's intent, and providing hyper-accurate, contextual, and intelligent replies.
+2. Carefully analyze the provided code, memory states, registers, flags, and assembled output.
+3. If the user asks you to write code, fix a bug, or add comments, you MUST output the fully commented, highly optimized code inside an \`\`\`assembly ... \`\`\` block.
+4. Explain the code elegantly, mirroring the flow of the code and the underlying architecture.
+5. Provide correct opcodes, addressing modes, and cycle counts if relevant.`,
 
-Focus on educational guidance rather than just providing code directly.`,
+  CODE_REVIEW: `Perform an expert-level architectural review of the user's 8085 assembly code:
+1. Identify logic flaws, suboptimal register usage, syntax errors, and flag mismanagement.
+2. For any fixes, provide the entirely corrected and optimized code in an \`\`\`assembly ... \`\`\` block.
+3. Automatically add clear, professional comments to explain the code flow if asked.
+4. Predict potential runtime crashes or memory overwrites based on the provided state.`,
 
-  CODE_REVIEW: `Review the user's 8085 assembly code and provide:
-1. Correctness of syntax and opcodes
-2. Logic flow and potential bugs
-3. Register usage optimization
-4. Memory addressing issues
-5. Flag operations and their consequences
-Provide constructive feedback to help improve their code.`,
-
-  DEBUGGING: `Help the user debug their 8085 assembly program:
-1. Identify the issue based on their description
-2. Ask about register values, memory contents, and flag states
-3. Suggest test cases and debugging approaches
-4. Walk through execution step by step if needed
-5. Point out off-by-one errors, register overwrites, etc.`,
+  DEBUGGING: `You are an elite debugging assistant for an 8085 emulator:
+1. Synthesize the provided context: current registers, flags, console output, assembly status, and memory states to pinpoint the exact failure.
+2. Explain the root cause clearly and concisely.
+3. Output the perfectly fixed code in an \`\`\`assembly ... \`\`\` block with comments explaining the fix.`,
 };
 
 export const useAIAssistant = () => {
   const [state, setState] = useState<AIAssistantState>({
     tokens: 0,
     messagesUsed: 0,
-    maxMessagesPerSession: 1, // Only 1 usage before needing tokens
+    maxMessagesPerSession: 100, // Updated to 100
     sessionActive: false,
     conversation: [],
     loading: false,
     error: null,
+    statusMessage: null,
   });
 
   // Load state from localStorage
@@ -106,15 +105,7 @@ export const useAIAssistant = () => {
       return null;
     }
 
-    if (state.messagesUsed >= state.maxMessagesPerSession && state.tokens === 0) {
-      setState((prev) => ({
-        ...prev,
-        error: 'Free session used. Please purchase tokens to continue.',
-      }));
-      return null;
-    }
-
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null, statusMessage: 'Calling AI API...' }));
 
     try {
       // Create the conversation history for the AI
@@ -125,8 +116,14 @@ export const useAIAssistant = () => {
         },
       ];
 
-      // Call the API (you would integrate with actual AI service)
-      const response = await callAIService(userMessage, assistantType, state.conversation, context);
+      // Call the API
+      const response = await callAIService(
+        userMessage, 
+        assistantType, 
+        state.conversation, 
+        context,
+        (msg: string) => setState(prev => ({ ...prev, statusMessage: msg }))
+      );
 
       if (!response) {
         throw new Error('Failed to get response from AI service');
@@ -197,27 +194,114 @@ export const useAIAssistant = () => {
   };
 };
 
-// Simulated AI service call (replace with actual API)
+let pipelineSingleton: any = null;
+
+async function getAIPipeline(onProgress?: (msg: string) => void) {
+    if (pipelineSingleton) return pipelineSingleton;
+    
+    if (onProgress) onProgress('Loading local AI model... (This may freeze the screen for a moment)');
+    
+    // Use a native browser ES Module import to completely bypass Turbopack and UMD variable traps
+    if (onProgress) onProgress('Downloading AI Engine...');
+    const transformersUrl = 'https://esm.sh/@xenova/transformers@2.17.2';
+    // The webpackIgnore comment forces Next.js to let the browser handle the import natively
+    const { pipeline, env } = await import(/* webpackIgnore: true */ transformersUrl);
+    
+    env.allowLocalModels = false;
+    env.backends.onnx.wasm.numThreads = 1;
+    // Point to a reliable CDN for the WASM binaries, jsdelivr usually works for WASM if not scripts
+    env.backends.onnx.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@1.17.1/dist/';
+
+    pipelineSingleton = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
+        progress_callback: (x: any) => {
+            if (x.status === 'progress' && onProgress) {
+                onProgress(`Downloading Local AI: ${Math.round(x.progress)}%`);
+            } else if (x.status === 'ready' && onProgress) {
+                onProgress('AI Ready. Thinking...');
+            }
+        }
+    });
+    
+    return pipelineSingleton;
+}
+
+async function runLocalAI(text: string, context: string, onProgress?: (msg: string) => void): Promise<string> {
+    const generator = await getAIPipeline(onProgress);
+    const prompt = `<|im_start|>system\nYou are an 8085 Assembly expert. Write clean, commented code.\nContext: ${context || 'None'}<|im_end|>\n<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`;
+    
+    const output = await generator(prompt, { 
+        max_new_tokens: 256, 
+        temperature: 0.2, 
+        do_sample: true 
+    });
+    
+    const generatedText = output[0].generated_text.replace(prompt, '').trim();
+    return generatedText;
+}
+
+// Actual API call with Fallback
 async function callAIService(
   userMessage: string,
   assistantType: 'guided' | 'review' | 'debug',
   conversationHistory: Message[],
-  context?: AIContext
+  context?: AIContext,
+  onProgress?: (msg: string) => void
 ): Promise<string> {
-  // This is a placeholder. In production, this would call your actual AI service
-  // For now, return helpful guidance based on the assistant type
-
   const systemPrompt = {
     guided: AI_INSTRUCTIONS.GUIDED_HELP,
     review: AI_INSTRUCTIONS.CODE_REVIEW,
     debug: AI_INSTRUCTIONS.DEBUGGING,
   }[assistantType];
 
-  // Simulate API call delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  let fullPrompt = `System Prompt: ${systemPrompt}\n\n`;
+  
+  if (context) {
+    fullPrompt += `=== CURRENT EMULATOR CONTEXT ===\nCode:\n\`\`\`assembly\n${context.code}\n\`\`\`\n\n`;
+    fullPrompt += `Registers: ${JSON.stringify(context.registers)}\n`;
+    fullPrompt += `Flags: ${JSON.stringify(context.flags)}\n`;
+    if (context.consoleOutput) fullPrompt += `Console Output: ${JSON.stringify(context.consoleOutput)}\n`;
+    if (context.isAssembled !== undefined) fullPrompt += `Is Assembled: ${context.isAssembled}\n`;
+    if (context.isRunning !== undefined) fullPrompt += `Is Running: ${context.isRunning}\n`;
+    if (context.assembledCode?.errors) fullPrompt += `Assembly Errors: ${JSON.stringify(context.assembledCode.errors)}\n`;
+    fullPrompt += `=================================\n\n`;
+  }
+  
+  if (conversationHistory.length > 0) {
+    fullPrompt += `Conversation History:\n`;
+    conversationHistory.slice(-5).forEach(m => {
+      fullPrompt += `${m.role}: ${m.content}\n`;
+    });
+    fullPrompt += `\n`;
+  }
 
-  // Return placeholder response (in production, this would be from your API)
-  return generateAssistantResponse(userMessage, assistantType, context);
+  fullPrompt += `User: ${userMessage}\nAssistant:`;
+
+  try {
+    const res = await fetch('/api/ai/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: fullPrompt })
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.generatedText) {
+        return data.generatedText;
+      }
+    }
+  } catch (err) {
+    console.error("AI API failed, using fallback:", err);
+  }
+
+  try {
+    if (onProgress) onProgress('Starting Local AI Fallback...');
+    const contextString = context ? `Code: ${context.code}` : '';
+    const generated = await runLocalAI(userMessage, contextString, onProgress);
+    return generated;
+  } catch (err) {
+    console.error("WebLLM failed:", err);
+    return `**Local AI Engine Error:**\nThe advanced offline model failed to load. \n\nError details: ${err instanceof Error ? err.message : String(err)}\n\nPlease check your internet connection for the initial download or refresh the page.`;
+  }
 }
 
 function generateAssistantResponse(
@@ -227,120 +311,135 @@ function generateAssistantResponse(
 ): string {
   const lowerMessage = userMessage.toLowerCase();
 
-  if (assistantType === 'guided') {
-    if (lowerMessage.includes('mvi')) {
-      return `Great! You want to learn about the MVI (Move Immediate) instruction. 
-      
-MVI is used to load an 8-bit immediate value into a register. 
-Format: MVI register, data
+  // 1. Code Generation for common 8085 problems
+  if (lowerMessage.includes('write') || lowerMessage.includes('code') || lowerMessage.includes('program')) {
+    if (lowerMessage.includes('add') && lowerMessage.includes('two')) {
+      return `Here is a program to add two numbers.
 
-The instruction:
-1. Takes 2 bytes (1 opcode + 1 data byte)
-2. Takes 7 clock cycles
-3. Loads the immediate value directly into the specified register
-4. Does NOT affect any flags
+\`\`\`assembly
+; Program to Add Two 8-bit Numbers
+LXI H, 2000H  ; Load address 2000H in HL pair
+MOV A, M      ; Move first number to Accumulator
+INX H         ; Increment HL pair to point to next memory location
+ADD M         ; Add second number to Accumulator
+INX H         ; Increment HL pair to store result
+MOV M, A      ; Store result in memory
+HLT           ; Halt execution
+\`\`\`
 
-Example: MVI A, 42H    ; Load 42 hex into accumulator
-
-Can you tell me which register you want to load the value into? And what value do you want to load?`;
+You can apply this to the editor and test it!`;
     }
+    if (lowerMessage.includes('subtract')) {
+      return `Here is a program to subtract two numbers.
 
-    if (lowerMessage.includes('add') || lowerMessage.includes('arithmetic')) {
-      return `Good question about arithmetic instructions!
-
-The 8085 has several arithmetic instructions:
-
-**ADD register** - Add register to A
-**ADI data** - Add immediate value to A  
-**SUB register** - Subtract register from A
-**SUI data** - Subtract immediate value from A
-**INR register** - Increment register (adds 1)
-**DCR register** - Decrement register (subtracts 1)
-
-All these instructions affect the flags: Z, S, P, CY, and AC
-
-What specific arithmetic operation are you trying to do? For example, are you trying to add two numbers together, or perform some calculation?`;
+\`\`\`assembly
+; Program to Subtract Two 8-bit Numbers
+LXI H, 2000H  ; Point HL to 2000H
+MOV A, M      ; Load first number into A
+INX H         ; Point HL to next memory location
+SUB M         ; Subtract second number from A
+INX H         ; Point to destination
+MOV M, A      ; Store the result
+HLT           ; Halt execution
+\`\`\`
+`;
     }
+    if (lowerMessage.includes('multiply') || lowerMessage.includes('multiplication')) {
+      return `Here is a program to multiply two 8-bit numbers (using successive addition).
 
-    return `I'm here to help you learn 8085 assembly programming!
+\`\`\`assembly
+; Program to Multiply Two Numbers
+LXI H, 2000H  ; Point to first number
+MOV B, M      ; Load first number into B (Counter)
+INX H         ; Point to second number
+MOV C, M      ; Load second number into C (Number to add)
+MVI A, 00H    ; Clear Accumulator for result
 
-You can ask me about:
-1. **Specific instructions** (MOV, MVI, ADD, SUB, JMP, CALL, etc.)
-2. **Register operations** and addressing modes
-3. **Logic flow** - how to structure your program
-4. **Flags** and how they work
-5. **Memory addressing** techniques
+MULTIPLY_LOOP:
+ADD C         ; Add the number to Accumulator
+DCR B         ; Decrement counter
+JNZ MULTIPLY_LOOP ; Repeat until counter is zero
 
-What would you like to learn about today?`;
+INX H         ; Point to result location
+MOV M, A      ; Store result
+HLT           ; Halt execution
+\`\`\`
+`;
+    }
   }
 
-  if (assistantType === 'review') {
+  // 2. Syntax Error Analysis & Debugging
+  if ((assistantType === 'debug' || assistantType === 'review' || lowerMessage.includes('error') || lowerMessage.includes('wrong') || lowerMessage.includes('bug')) && context?.assembledCode?.errors?.length > 0) {
+    const errorDetails = context?.assembledCode?.errors.map((err: any) => `- Line ${err.line}: ${err.message}`).join('\\n');
+    return `I detected syntax errors in your code during assembly. Please fix these issues:\n\n${errorDetails}\n\nOnce fixed, try running the code again!`;
+  }
+
+  // 3. Smart Code Review (when no syntax errors)
+  if (assistantType === 'review' || lowerMessage.includes('review')) {
     if (context && context.code) {
-      return `Code Review Analysis for your current code:
-
-✓ **Structure:**
-- Found ${context.code.split('\n').filter(l => l.trim() && !l.trim().startsWith(';')).length} lines of code.
-
-⚠️ **Suggestions:**
-- Ensure you have a HLT instruction at the end.
-- Check if you are initializing registers before use.
-
-Would you like me to analyze a specific part of your code?`;
+      let issues = [];
+      if (!context.code.toUpperCase().includes('HLT')) {
+        issues.push('- ⚠️ **Missing HLT:** Your program does not seem to end with a HLT instruction, which will cause it to run indefinitely.');
+      }
+      if (context.code.toUpperCase().includes('MOV M, M')) {
+        issues.push('- ⚠️ **Invalid MOV M, M:** You cannot move memory to memory directly (MOV M, M is an invalid/halting opcode).');
+      }
+      
+      const lineCount = context.code.split('\\n').filter(l => l.trim() && !l.trim().startsWith(';')).length;
+      
+      if (issues.length > 0) {
+        return `Code Review Analysis:\n\n✓ **Structure:** Found ${lineCount} instructions.\n\n${issues.join('\\n')}\n\nI recommend fixing these issues to prevent unexpected behavior.`;
+      }
+      
+      return `Code Review Analysis:\n\n✓ **Structure:** Found ${lineCount} instructions.\n✓ **Status:** Code assembled successfully without syntax errors!\n\nYour code looks solid architecturally!`;
     }
-
-    if (lowerMessage.includes('MVI') || lowerMessage.includes('ADD')) {
-      return `Code Review Analysis:
-
-✓ **Correct Elements:**
-- Instruction syntax appears correct
-- Register usage follows addressing mode rules
-
-⚠️ **Suggestions:**
-- Consider the order of operations
-- Ensure all used registers are initialized
-- Check if you need to save/restore register values
-
-Could you share your complete code snippet for a more detailed review?`;
-    }
-
-    return `Please paste the 8085 assembly code you'd like me to review. Include:
-1. The assembly instructions
-2. What you're trying to accomplish
-3. Any errors or unexpected behavior
-
-I'll analyze it for:
-- Correctness of syntax and opcodes
-- Logic flow and potential bugs
-- Register usage and optimization
-- Flag operations`;
   }
 
-  if (assistantType === 'debug') {
+  // 4. Smart Auto-Commenting Feature
+  if (lowerMessage.includes('comment') || lowerMessage.includes('explain')) {
+      const codeToComment = context?.code || 'MVI A, 42H\\nHLT';
+      const commentedCode = codeToComment.split('\\n').map(line => {
+        if (!line.trim() || line.includes(';')) return line;
+        const upper = line.toUpperCase();
+        let comment = ' ; Execute operation';
+        if (upper.includes('MVI A')) comment = ' ; Load immediate value into Accumulator';
+        else if (upper.startsWith('LXI')) comment = ' ; Load 16-bit address into register pair';
+        else if (upper.startsWith('INX')) comment = ' ; Increment register pair';
+        else if (upper.startsWith('DCX')) comment = ' ; Decrement register pair';
+        else if (upper.includes('HLT')) comment = ' ; Halt the execution';
+        else if (upper.startsWith('MOV B, A')) comment = ' ; Copy Accumulator to register B';
+        else if (upper.startsWith('MOV M, A')) comment = ' ; Store Accumulator value into Memory';
+        else if (upper.startsWith('MOV A, M')) comment = ' ; Load Memory value into Accumulator';
+        else if (upper.startsWith('ADD')) comment = ' ; Add register/memory to Accumulator';
+        else if (upper.startsWith('SUB')) comment = ' ; Subtract register/memory from Accumulator';
+        else if (upper.startsWith('JMP')) comment = ' ; Unconditional jump to address';
+        else if (upper.startsWith('JNZ')) comment = ' ; Jump to address if Zero flag is reset';
+        else if (upper.startsWith('JZ')) comment = ' ; Jump to address if Zero flag is set';
+        else if (upper.startsWith('STA')) comment = ' ; Store Accumulator direct to memory';
+        else if (upper.startsWith('LDA')) comment = ' ; Load Accumulator direct from memory';
+        
+        // Match instruction spacing (padding to column 15)
+        const paddedLine = line.padEnd(15, ' ');
+        return paddedLine + comment;
+      }).join('\\n');
+
+      return `Here is your code with detailed comments explaining the flow:\n\n\`\`\`assembly\n${commentedCode}\n\`\`\`\n\nYou can click **Apply to Editor** to insert these comments directly into your workspace.`;
+  }
+
+  // 5. Execution & Runtime Debugging
+  if (assistantType === 'debug' || lowerMessage.includes('debug')) {
     if (context) {
-      return `Debug Helper: Analyzing current state...
-
-**Current Registers:**
-A: ${context.registers.A || '00'} | B: ${context.registers.B || '00'} | C: ${context.registers.C || '00'}
-DE: ${context.registers.D}${context.registers.E} | HL: ${context.registers.H}${context.registers.L}
-PC: ${context.registers.PC} | SP: ${context.registers.SP}
-
-**Flags:**
-Z: ${context.flags.Z} | S: ${context.flags.S} | CY: ${context.flags.CY}
-
-Based on this state, what specific issue are you observing? The registers show the values above.`;
+      return `Debug Engine Initialized...\n\n**Current Registers:**\nA: ${context.registers.A || '00'} | B: ${context.registers.B || '00'} | C: ${context.registers.C || '00'}\nDE: ${context.registers.D}${context.registers.E} | HL: ${context.registers.H}${context.registers.L}\nPC: ${context.registers.PC} | SP: ${context.registers.SP}\n\n**Flags:**\nZ: ${context.flags.Z} | S: ${context.flags.S} | CY: ${context.flags.CY}\n\n**Status:** ${context.isRunning ? 'Executing...' : 'Paused/Stopped'}\n\nLook at the registers above. Is the Accumulator (A) holding the value you expect at this point in execution? Step through the code using the Step button to observe changes line-by-line.`;
     }
-
-    return `Debug Helper: Let's figure out what's wrong!
-
-To help you debug, I need to know:
-1. **What's the expected behavior?** What should the program do?
-2. **What's happening instead?** What's the actual behavior?
-3. **Register values** - What are the values in A, B, C, etc.?
-4. **Memory contents** - What's in memory at key addresses?
-5. **Flags status** - What are the Zero, Carry, Sign flags?
-
-Share these details and I'll help you find the issue!`;
   }
 
-  return 'How can I help you with 8085 assembly programming?';
+  // 6. General Knowledge Fallback
+  if (lowerMessage.includes('mvi')) {
+    return `MVI is used to load an 8-bit immediate value into a register.\nFormat: \`MVI register, data\`\n\n- Takes 2 bytes (1 opcode + 1 data byte)\n- Takes 7 clock cycles\n- Does NOT affect any flags\n\nExample:\n\`\`\`assembly\nMVI A, 42H    ; Load 42 hex into accumulator\n\`\`\``;
+  }
+  if (lowerMessage.includes('mov')) {
+    return `MOV copies data from a source register/memory to a destination register/memory.\nFormat: \`MOV destination, source\`\n\n- Takes 1 byte\n- Takes 4 clock cycles (7 if memory is involved)\n- Does NOT affect any flags\n\nExample:\n\`\`\`assembly\nMOV B, A      ; Copy Accumulator to Register B\n\`\`\``;
+  }
+  
+  return `I am currently operating in **Local Engine Mode** (Offline/API disconnected). \n\nEven offline, I can:\n1. Find syntax errors in your code\n2. Add comments to your code (type "comment my code")\n3. Write basic programs (e.g. "write code to multiply two numbers")\n4. Perform a code review (type "review")\n5. Analyze your current register/flag states (type "debug")\n\nWhat would you like to do?`;
 }
