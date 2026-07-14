@@ -15,7 +15,7 @@ export default function LEDBar({ value }: LEDBarProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-[#0d0d12]">
         <Lightbulb className="w-4 h-4 text-[#2AFFAE]" />
-        <span className="text-xs text-gray-400">LED Output (Port 01H)</span>
+        <span className="text-xs text-muted-foreground">LED Output (Port 01H)</span>
       </div>
 
       {/* LED Bar */}
@@ -27,7 +27,7 @@ export default function LEDBar({ value }: LEDBarProps) {
                 on ? "bg-[#2AFFAE] shadow-[0_0_12px_#2AFFAE,0_0_24px_#2AFFAE50]" : "bg-[#1a1a1a]"
               }`}
             />
-            <span className="text-[8px] text-gray-600 font-mono">{7 - i}</span>
+            <span className="text-[8px] text-muted-foreground/70 font-mono">{7 - i}</span>
           </div>
         ))}
       </div>

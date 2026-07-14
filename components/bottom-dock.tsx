@@ -36,8 +36,8 @@ export default function BottomDock({ tabs, defaultTab, height = 220, className }
       <div className="flex items-center gap-0 border-b border-border bg-muted/30 shrink-0 overflow-x-auto">
         {/* Drag handle / label */}
         <div className="flex items-center gap-1.5 px-3 border-r border-border shrink-0">
-          <GripHorizontal className="w-3.5 h-3.5 text-gray-600" />
-          <span className="text-[10px] uppercase tracking-widest text-gray-600 font-medium">PANEL</span>
+          <GripHorizontal className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-medium">PANEL</span>
         </div>
 
         {tabs.map((tab) => {
@@ -50,14 +50,14 @@ export default function BottomDock({ tabs, defaultTab, height = 220, className }
               className={cn(
                 "flex items-center gap-1.5 px-4 py-2 text-xs font-medium border-r border-border transition-all duration-150 shrink-0 relative",
                 isActive
-                  ? "text-white bg-white/[0.04]"
-                  : "text-gray-500 hover:text-gray-300 hover:bg-muted/50"
+                  ? "text-foreground bg-white/[0.04]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
-              <Icon className={cn("w-3.5 h-3.5", isActive ? "text-purple-400" : "text-gray-500")} />
+              <Icon className={cn("w-3.5 h-3.5", isActive ? "text-purple-400" : "text-muted-foreground")} />
               {tab.label}
               {tab.badge !== undefined && (
-                <span className="ml-1 text-[10px] font-mono px-1 rounded bg-white/10 text-gray-400">
+                <span className="ml-1 text-[10px] font-mono px-1 rounded bg-muted text-muted-foreground">
                   {tab.badge}
                 </span>
               )}

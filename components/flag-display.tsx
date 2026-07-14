@@ -42,7 +42,7 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Flag className="w-4 h-4 text-emerald-400" />
-        <span className="text-sm font-medium text-gray-300">Flag Register</span>
+        <span className="text-sm font-medium text-foreground">Flag Register</span>
       </div>
 
       <div className="p-4">
@@ -64,10 +64,10 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
                             : "bg-muted/50 border-border"
                       }`}
                     >
-                      <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{flag}</div>
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{flag}</div>
                       <div
                         className={`font-mono text-lg font-semibold transition-colors ${
-                          value ? "text-emerald-400" : "text-white/40"
+                          value ? "text-emerald-400" : "text-foreground/40"
                         }`}
                       >
                         {value ? "1" : "0"}

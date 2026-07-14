@@ -29,7 +29,7 @@ export default function EditorPanel({ code, setCode }: EditorPanelProps) {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`relative flex items-center gap-2 px-4 py-3 text-sm transition-colors ${
-              activeTab === tab.id ? "text-[#00F5FF]" : "text-gray-500 hover:text-gray-300"
+              activeTab === tab.id ? "text-[#00F5FF]" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -49,7 +49,7 @@ export default function EditorPanel({ code, setCode }: EditorPanelProps) {
         {/* Line Numbers */}
         <div className="bg-[#080810] px-3 py-4 text-right select-none border-r border-border">
           {lines.map((_, i) => (
-            <div key={i} className="text-xs text-gray-600 font-mono leading-6">
+            <div key={i} className="text-xs text-muted-foreground/70 font-mono leading-6">
               {i + 1}
             </div>
           ))}

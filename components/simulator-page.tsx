@@ -99,7 +99,7 @@ export default function SimulatorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
       <NavigationBar />
 
       <main className="container mx-auto px-4 py-6 animate-fade-in">

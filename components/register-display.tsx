@@ -40,10 +40,10 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
           : "bg-muted/50 border-border"
       }`}
     >
-      <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{label}</div>
       <div
         className={`font-mono text-lg font-semibold transition-colors ${
-          changedRegs.has(reg) ? "text-blue-400" : "text-white"
+          changedRegs.has(reg) ? "text-blue-600 dark:text-blue-400" : "text-foreground"
         }`}
       >
         {registers[reg]}
@@ -56,8 +56,8 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
     return (
       <div className="flex flex-col gap-1 border border-border bg-muted/30 rounded-lg p-2">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-gray-500 uppercase tracking-wider">{title}</span>
-          <span className="text-[10px] text-gray-600 font-mono">{pairValue}H</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{title}</span>
+          <span className="text-[10px] text-muted-foreground font-mono">{pairValue}H</span>
         </div>
         <div className="grid grid-cols-2 gap-2 mt-1">
           <RegisterBox reg={highReg} label={highReg} />
@@ -71,14 +71,14 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
     <div className="rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
-        <Cpu className="w-4 h-4 text-blue-400" />
-        <span className="text-sm font-medium text-gray-300">CPU Registers</span>
+        <Cpu className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        <span className="text-sm font-medium text-foreground">CPU Registers</span>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Accumulator */}
         <div className="border border-border bg-muted/30 rounded-lg p-2">
-          <span className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Accumulator (A)</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Accumulator (A)</span>
           <RegisterBox reg="A" label="A" />
         </div>
 
@@ -99,7 +99,7 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
                   : "bg-muted/50 border-border"
               }`}
             >
-              <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
                 Program Counter
               </div>
               {editingPC ? (
@@ -120,7 +120,7 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
                     value={pcInput}
                     onChange={(e) => setPcInput(e.target.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 4))}
                     onBlur={() => setEditingPC(false)}
-                    className="w-full bg-transparent border-b border-cyan-500/50 outline-none font-mono text-xl font-semibold text-cyan-400"
+                    className="w-full bg-transparent border-b border-cyan-500/50 outline-none font-mono text-xl font-semibold text-cyan-600 dark:text-cyan-400"
                     placeholder="0000"
                   />
                 </form>
@@ -130,8 +130,8 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
                     setPcInput(registers["PC"]);
                     setEditingPC(true);
                   }}
-                  className={`font-mono text-xl font-semibold transition-colors cursor-text hover:text-cyan-200 ${
-                    changedRegs.has("PC") ? "text-cyan-400" : "text-white"
+                  className={`font-mono text-xl font-semibold transition-colors cursor-text hover:text-cyan-500 dark:hover:text-cyan-200 ${
+                    changedRegs.has("PC") ? "text-cyan-600 dark:text-cyan-400" : "text-foreground"
                   }`}
                   title="Click to edit Program Counter"
                 >
@@ -146,12 +146,12 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
                   : "bg-muted/50 border-border"
               }`}
             >
-              <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
                 Stack Pointer
               </div>
               <div
                 className={`font-mono text-lg font-semibold transition-colors ${
-                  changedRegs.has("SP") ? "text-cyan-400" : "text-white"
+                  changedRegs.has("SP") ? "text-cyan-600 dark:text-cyan-400" : "text-foreground"
                 }`}
               >
                 {registers["SP"]}

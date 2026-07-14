@@ -66,7 +66,7 @@ export default function SevenSegment({ value }: SevenSegmentProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-[#0d0d12]">
         <Monitor className="w-4 h-4 text-[#FF3B3B]" />
-        <span className="text-xs text-gray-400">7-Segment Display</span>
+        <span className="text-xs text-muted-foreground">7-Segment Display</span>
       </div>
 
       {/* Display */}

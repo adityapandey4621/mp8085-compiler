@@ -37,7 +37,7 @@ export default function OutputDisplay({ ledValue, segmentValue }: OutputDisplayP
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Monitor className="w-4 h-4 text-purple-400" />
-        <span className="text-sm font-medium text-gray-300">Output Display</span>
+        <span className="text-sm font-medium text-foreground">Output Display</span>
       </div>
 
       <div className="p-4 space-y-4">
@@ -81,7 +81,7 @@ export default function OutputDisplay({ ledValue, segmentValue }: OutputDisplayP
                   bit ? "bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]" : "bg-gray-700"
                 }`}
               />
-              <span className="text-[9px] text-gray-500 font-mono">D{7 - i}</span>
+              <span className="text-[9px] text-muted-foreground font-mono">D{7 - i}</span>
             </div>
           ))}
         </div>

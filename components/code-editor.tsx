@@ -90,26 +90,26 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
     let content = []
     
     if (line.trim().startsWith(";")) {
-      content.push(<span key={0} className="text-gray-500">{line}</span>)
+      content.push(<span key={0} className="text-muted-foreground">{line}</span>)
     } else {
       const parts = line.split(/(\s+|;.*)/)
       content = parts.map((part, i) => {
         if (!syntaxHighlighting) {
-          if (part.trim().startsWith(";")) return <span key={i} className="text-gray-500">{part}</span>
-          return <span key={i} className="text-gray-200">{part}</span>
+          if (part.trim().startsWith(";")) return <span key={i} className="text-muted-foreground">{part}</span>
+          return <span key={i} className="text-foreground">{part}</span>
         }
-        if (part.trim().startsWith(";")) return <span key={i} className="text-gray-500">{part}</span>
-        if (OPCODES.includes(part.toUpperCase())) return <span key={i} className="text-blue-400 font-bold">{part}</span>
-        if (part.match(/^[0-9A-Fa-f]+H?$/)) return <span key={i} className="text-orange-400">{part}</span>
-        if (part.match(/^[A-Z]$/)) return <span key={i} className="text-yellow-400">{part}</span>
-        return <span key={i} className="text-gray-200">{part}</span>
+        if (part.trim().startsWith(";")) return <span key={i} className="text-muted-foreground">{part}</span>
+        if (OPCODES.includes(part.toUpperCase())) return <span key={i} className="text-blue-700 dark:text-blue-400 font-bold">{part}</span>
+        if (part.match(/^[0-9A-Fa-f]+H?$/)) return <span key={i} className="text-orange-600 dark:text-orange-400">{part}</span>
+        if (part.match(/^[A-Z]$/)) return <span key={i} className="text-yellow-600 dark:text-yellow-400 font-semibold">{part}</span>
+        return <span key={i} className="text-foreground">{part}</span>
       })
     }
 
     // Add Ghost Text if on current line
     const currentCursorLine = code.slice(0, textareaRef.current?.selectionStart || 0).split("\n").length - 1
     if (enableCompanion && suggestion && lineIndex === currentCursorLine) {
-      content.push(<span key="ghost" className="text-gray-500 opacity-50 italic pointer-events-none">{suggestion}</span>)
+      content.push(<span key="ghost" className="text-muted-foreground opacity-50 italic pointer-events-none">{suggestion}</span>)
     }
 
     return content
@@ -247,14 +247,14 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
-          <FileCode className="w-4 h-4 text-blue-400" />
-          <span className="text-sm font-medium text-gray-300">program.asm</span>
+          <FileCode className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+          <span className="text-sm font-medium text-foreground">program.asm</span>
         </div>
         
         {/* Companion Mode Toggle */}
         <div 
           className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer transition-colors ${
-            companionMode ? "bg-purple-500/20 text-purple-400" : "bg-gray-800 text-gray-500 hover:bg-gray-700 hover:text-gray-400"
+            companionMode ? "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400" : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
           }`}
           onClick={() => setCompanionMode(!companionMode)}
           title={isGuest ? "Sign in to use Companion Mode" : "Toggle AI Companion Mode"}
@@ -277,10 +277,10 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
               key={i}
               style={{ fontSize: `${fontSize}px`, lineHeight: '1.5em' }}
               className={`px-1 font-mono text-right min-w-[2.5rem] flex items-center justify-end gap-1 transition-colors ${
-                activeLine === i + 1 ? "text-cyan-400 font-bold" : "text-gray-600"
+                activeLine === i + 1 ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-muted-foreground/70"
               }`}
             >
-              {activeLine === i + 1 && <Play className="w-2.5 h-2.5 fill-cyan-400" />}
+              {activeLine === i + 1 && <Play className="w-2.5 h-2.5 fill-cyan-600 dark:fill-cyan-400" />}
               {i + 1}
             </div>
           ))}
@@ -303,7 +303,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
           {/* Syntax Highlight Layer */}
           <div
             ref={bgRef}
-            className="absolute inset-0 p-3 font-mono text-gray-200 pointer-events-none whitespace-pre overflow-hidden"
+            className="absolute inset-0 p-3 font-mono text-foreground pointer-events-none whitespace-pre overflow-hidden"
             style={{ fontSize: `${fontSize}px`, lineHeight: '1.5em' }}
           >
             {lines.map((line, i) => (

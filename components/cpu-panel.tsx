@@ -75,7 +75,7 @@ export default function CPUPanel({
               : "bg-gray-600"
           }`}
         />
-        <span className="text-[11px] font-medium text-gray-400 flex-1 truncate">
+        <span className="text-[11px] font-medium text-muted-foreground flex-1 truncate">
           {isRunning
             ? "Running…"
             : isAssembled
@@ -84,7 +84,7 @@ export default function CPUPanel({
               : `PC: ${registers.PC} — Ready`
             : "Not assembled"}
         </span>
-        <span className="font-mono text-[10px] text-gray-600 shrink-0">
+        <span className="font-mono text-[10px] text-muted-foreground/70 shrink-0">
           SP: {registers.SP}
         </span>
       </div>
@@ -103,10 +103,10 @@ export default function CPUPanel({
                     : "bg-muted/50 border-border"
                 }`}
               >
-                <div className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">{reg}</div>
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wider mb-0.5">{reg}</div>
                 <div
                   className={`font-mono text-base font-semibold leading-none transition-colors ${
-                    changedRegs.has(reg) ? "text-blue-300" : "text-white"
+                    changedRegs.has(reg) ? "text-blue-300" : "text-foreground"
                   }`}
                 >
                   {registers[reg]}
@@ -126,12 +126,12 @@ export default function CPUPanel({
                     : "bg-muted/50 border-border"
                 }`}
               >
-                <div className="text-[9px] text-gray-500 uppercase tracking-wider">
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wider">
                   {reg === "PC" ? "Program Counter" : "Stack Pointer"}
                 </div>
                 <div
                   className={`font-mono text-lg font-bold transition-colors ${
-                    changedRegs.has(reg) ? "text-cyan-300" : "text-white"
+                    changedRegs.has(reg) ? "text-cyan-300" : "text-foreground"
                   }`}
                 >
                   {registers[reg]}
@@ -161,7 +161,7 @@ export default function CPUPanel({
                           : "bg-muted/50 border-border"
                       }`}
                     >
-                      <div className="text-[9px] text-gray-500 uppercase tracking-wider mb-1">{flag}</div>
+                      <div className="text-[9px] text-muted-foreground uppercase tracking-wider mb-1">{flag}</div>
                       <div
                         className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                           value
@@ -171,7 +171,7 @@ export default function CPUPanel({
                       />
                       <div
                         className={`font-mono text-xs font-bold mt-1 ${
-                          value ? "text-emerald-300" : "text-gray-600"
+                          value ? "text-emerald-300" : "text-muted-foreground/70"
                         }`}
                       >
                         {value}

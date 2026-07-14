@@ -28,20 +28,20 @@ export default function MemoryViewer({ memory, currentPC }: MemoryViewerProps) {
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-[#0d0d12]">
         <div className="flex items-center gap-2">
           <Database className="w-4 h-4 text-[#4A90E2]" />
-          <span className="text-sm font-medium text-white">Memory Viewer</span>
+          <span className="text-sm font-medium text-foreground">Memory Viewer</span>
         </div>
         <div className="flex items-center gap-2 bg-background border border-border rounded-lg px-2 py-1">
-          <Search className="w-3 h-3 text-gray-500" />
+          <Search className="w-3 h-3 text-muted-foreground" />
           <input
             type="text"
             placeholder="Go to address..."
-            className="bg-transparent text-xs text-white w-24 focus:outline-none placeholder:text-gray-600"
+            className="bg-transparent text-xs text-foreground w-24 focus:outline-none placeholder:text-muted-foreground/70"
           />
         </div>
       </div>
 
       {/* Header Row */}
-      <div className="flex px-4 py-2 border-b border-border bg-[#0d0d12]/50 text-[10px] text-gray-500 font-mono">
+      <div className="flex px-4 py-2 border-b border-border bg-[#0d0d12]/50 text-[10px] text-muted-foreground font-mono">
         <span className="w-16">ADDR</span>
         {Array.from({ length: 16 }, (_, i) => (
           <span key={i} className="w-6 text-center">
@@ -71,7 +71,7 @@ export default function MemoryViewer({ memory, currentPC }: MemoryViewerProps) {
                   <span
                     key={byteIdx}
                     className={`w-6 text-center transition-all duration-200 ${
-                      isPC ? "text-[#00F5FF]" : "text-gray-500"
+                      isPC ? "text-[#00F5FF]" : "text-muted-foreground"
                     }`}
                     style={{
                       textShadow: isPC ? "0 0 10px #00F5FF" : "none",

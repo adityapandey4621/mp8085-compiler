@@ -21,7 +21,7 @@ export default function OutputConsole({ logs }: OutputConsoleProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-[#0d0d12]">
         <Terminal className="w-4 h-4 text-[#2AFFAE]" />
-        <span className="text-sm text-gray-400">Output Console</span>
+        <span className="text-sm text-muted-foreground">Output Console</span>
       </div>
 
       {/* Console Body */}
@@ -40,10 +40,10 @@ export default function OutputConsole({ logs }: OutputConsoleProps) {
                       ? "text-[#00F5FF]"
                       : log.includes("[RESET]")
                         ? "text-[#A66CFF]"
-                        : "text-gray-500"
+                        : "text-muted-foreground"
             }`}
           >
-            <span className="text-gray-600 mr-2">{String(i + 1).padStart(2, "0")}</span>
+            <span className="text-muted-foreground/70 mr-2">{String(i + 1).padStart(2, "0")}</span>
             {log}
           </div>
         ))}

@@ -27,7 +27,7 @@ export default function RegisterPanel({ registers }: RegisterPanelProps) {
           <div className="absolute inset-0 bg-[#00F5FF] blur-md opacity-40" />
           <Cpu className="w-5 h-5 text-[#00F5FF] relative" />
         </div>
-        <span className="text-sm font-medium text-white">CPU Registers</span>
+        <span className="text-sm font-medium text-foreground">CPU Registers</span>
       </div>
 
       {/* Register Grid */}
@@ -48,7 +48,7 @@ export default function RegisterPanel({ registers }: RegisterPanelProps) {
             <div className="relative">
               <span className="text-[10px] text-[#00F5FF] tracking-wider uppercase">{reg.name}</span>
               <div
-                className="font-mono text-2xl font-bold text-white mt-1 transition-all duration-200"
+                className="font-mono text-2xl font-bold text-foreground mt-1 transition-all duration-200"
                 style={{
                   textShadow: "0 0 10px rgba(0, 245, 255, 0.5)",
                 }}
@@ -56,7 +56,7 @@ export default function RegisterPanel({ registers }: RegisterPanelProps) {
                 {registers[reg.name]}
                 <span className="text-[#4A90E2]/50 text-sm ml-1">H</span>
               </div>
-              <span className="text-[9px] text-gray-600">{reg.label}</span>
+              <span className="text-[9px] text-muted-foreground/70">{reg.label}</span>
             </div>
           </div>
         ))}

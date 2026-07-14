@@ -20,7 +20,7 @@ export default function FlagPanel({ flags }: FlagPanelProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-[#0d0d12]">
         <Flag className="w-4 h-4 text-[#2AFFAE]" />
-        <span className="text-sm font-medium text-white">Status Flags</span>
+        <span className="text-sm font-medium text-foreground">Status Flags</span>
       </div>
 
       {/* Flag LEDs */}
@@ -37,7 +37,7 @@ export default function FlagPanel({ flags }: FlagPanelProps) {
                 }`}
               />
               <span className="text-xs font-mono text-[#00F5FF]">{flag.name}</span>
-              <span className="text-[9px] text-gray-600">{flag.label}</span>
+              <span className="text-[9px] text-muted-foreground/70">{flag.label}</span>
             </div>
           )
         })}

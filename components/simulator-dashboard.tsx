@@ -28,6 +28,7 @@ import { AIAssistantPanel } from "./ai-assistant-panel"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useSettings } from "@/components/settings-provider"
+import { useUserStats } from "@/hooks/use-user-stats"
 
 const sampleCode = `; 8085 Assembly Program
 ; Add two numbers
@@ -42,6 +43,7 @@ export default function SimulatorDashboard() {
   const [code, setCode] = useState(sampleCode)
   const { data: session } = useSession()
   const { showInstructionTrace } = useSettings()
+  const { recordExecution, recordProgramCreated, updateStat, addRecentFile } = useUserStats()
 
   useEffect(() => {
     const savedCode = localStorage.getItem("mp8085-autosave-code")
@@ -66,6 +68,14 @@ export default function SimulatorDashboard() {
   } = useSimulator()
 
   const [aiOpen, setAiOpen] = useState(false)
+
+  // Track Simulator Time
+  useEffect(() => {
+    const timer = setInterval(() => {
+      updateStat("simulatorSeconds", (prev: number) => (prev || 0) + 10)
+    }, 10000)
+    return () => clearInterval(timer)
+  }, [updateStat])
 
   // ─── Keyboard Shortcuts ──────────────────────────────────────────────────
   useEffect(() => {
@@ -144,7 +154,7 @@ export default function SimulatorDashboard() {
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
   const handleAssemble = () => assembleCode(code)
-  const handleRun      = () => runProgram()
+  const handleRun      = () => { recordExecution(); runProgram() }
   const handleStep     = () => stepProgram()
   const handleReset    = () => { resetSimulator(); setCode("") }
   const handleClear    = () => { clearCode(); setCode("") }
@@ -160,6 +170,7 @@ export default function SimulatorDashboard() {
       })
       if (response.ok) {
         toast.success("Code saved successfully!")
+        recordProgramCreated()
       } else {
         const error = await response.json()
         toast.error(error.error || "Failed to save code")
@@ -171,6 +182,7 @@ export default function SimulatorDashboard() {
 
   const handleOpen = (content: string) => {
     setCode(content)
+    addRecentFile("Local File")
     toast.success("File opened successfully!")
   }
 
@@ -203,10 +215,10 @@ export default function SimulatorDashboard() {
   // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background text-white flex flex-col">
+    <div className="h-screen overflow-hidden bg-background text-foreground flex flex-col">
       <SimulatorNav />
 
-      <main className="flex-1 container mx-auto px-4 py-4 animate-fade-in">
+      <main className="flex-1 min-h-0 max-w-[1800px] mx-auto w-full animate-fade-in flex flex-col px-2 pb-2">
         {/* Control Bar */}
         <ControlBar
           onAssemble={handleAssemble}
@@ -219,10 +231,11 @@ export default function SimulatorDashboard() {
           onOpen={handleOpen}
           onShare={handleShare}
           onDownload={handleDownload}
+          isRunning={isRunning}
         />
 
-        {/* Main Layout with AI Assistant */}
-        <div className="mt-4 min-h-[calc(100vh-180px)] h-[calc(100vh-180px)] border border-border rounded-lg overflow-hidden">
+        {/* Main Layout */}
+        <div className="flex-1 min-h-0 mt-2 border border-border rounded-lg overflow-hidden bg-background">
           <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="simulator-main-layout">
             {/* LEFT COLUMN: 30% */}
             <ResizablePanel defaultSize={30} minSize={20} id="panel-left" order={1}>
@@ -232,11 +245,11 @@ export default function SimulatorDashboard() {
                     <CodeEditor code={code} setCode={setCode} activeLine={currentLine} />
                   </div>
                 </ResizablePanel>
-                <ResizableHandle className="bg-white/5" />
+                <ResizableHandle className="bg-muted/50" />
                 <ResizablePanel defaultSize={30} id="panel-console" order={2}>
                   <div className="h-full p-2 pt-0 flex flex-col">
                     <Tabs defaultValue="console" className="flex-1 flex flex-col min-h-0">
-                      <TabsList className="w-full bg-white/5 border border-border mb-2 shrink-0">
+                      <TabsList className="w-full bg-muted/50 border border-border mb-2 shrink-0">
                         <TabsTrigger value="console" className="flex-1 text-xs">Console</TabsTrigger>
                         {showInstructionTrace && (
                           <TabsTrigger value="history" className="flex-1 text-xs">Instruction History</TabsTrigger>
@@ -256,7 +269,7 @@ export default function SimulatorDashboard() {
               </ResizablePanelGroup>
             </ResizablePanel>
             
-            <ResizableHandle className="bg-white/5" />
+            <ResizableHandle className="bg-muted/50" />
 
             {/* MIDDLE COLUMN: 40% */}
             <ResizablePanel defaultSize={40} minSize={30} id="panel-middle" order={2}>
@@ -295,7 +308,7 @@ export default function SimulatorDashboard() {
               </div>
             </ResizablePanel>
 
-            <ResizableHandle className="bg-white/5" />
+            <ResizableHandle className="bg-muted/50" />
 
             {/* RIGHT COLUMN: 30% */}
             <ResizablePanel defaultSize={30} minSize={20} id="panel-right" order={3}>
@@ -329,10 +342,10 @@ export default function SimulatorDashboard() {
             <Button 
               className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-purple-600 hover:bg-purple-700 p-0"
             >
-              <Bot className="w-6 h-6 text-white" />
+              <Bot className="w-6 h-6 text-foreground" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[400px] h-[600px] p-0 border-border/60 bg-background text-white flex flex-col">
+          <DialogContent className="max-w-[400px] h-[600px] p-0 border-border/60 bg-background text-foreground flex flex-col">
             <DialogHeader className="p-4 border-b border-border/60 shrink-0">
               <DialogTitle>AI Assistant</DialogTitle>
             </DialogHeader>

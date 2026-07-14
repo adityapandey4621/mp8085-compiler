@@ -36,12 +36,12 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
         <div className="relative p-6">
           <DialogHeader className="text-center mb-6">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center mx-auto mb-4">
-              <Cpu className="w-6 h-6 text-white" />
+              <Cpu className="w-6 h-6 text-foreground" />
             </div>
             <DialogTitle className="text-xl font-semibold">
               {mode === "login" ? "Welcome back" : "Create your account"}
             </DialogTitle>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {mode === "login" ? "Sign in to continue to MP8085" : "Get started with MP8085 for free"}
             </p>
           </DialogHeader>
@@ -57,7 +57,7 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
           <div className="space-y-3 mb-6">
             <Button
               variant="outline"
-              className="w-full h-11 bg-white/5 border-border/60 hover:bg-white/10 hover:border-white/20 gap-3"
+              className="w-full h-11 bg-muted/50 border-border/60 hover:bg-muted hover:border-white/20 gap-3"
               onClick={() => handleOAuth("google")}
               disabled={loading}
             >
@@ -84,17 +84,17 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
 
             <div className="relative flex items-center py-2">
               <div className="grow border-t border-border/60"></div>
-              <span className="shrink-0 px-2 text-xs text-gray-500 font-medium">OR</span>
+              <span className="shrink-0 px-2 text-xs text-muted-foreground font-medium">OR</span>
               <div className="grow border-t border-border/60"></div>
             </div>
 
             <Button
               variant="outline"
-              className="w-full h-11 bg-white/5 border-border/60 hover:bg-white/10 hover:border-white/20 gap-3"
+              className="w-full h-11 bg-muted/50 border-border/60 hover:bg-muted hover:border-white/20 gap-3"
               onClick={() => handleOAuth("credentials")}
               disabled={loading}
             >
-              <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               Continue as Guest

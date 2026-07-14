@@ -31,7 +31,7 @@ const colorMap = {
   purple:  { icon: "text-purple-400",  glow: "shadow-[0_0_20px_rgba(168,85,247,0.08)]", border: "border-purple-500/20" },
   rose:    { icon: "text-rose-400",    glow: "shadow-[0_0_20px_rgba(244,63,94,0.08)]",  border: "border-rose-500/20" },
   cyan:    { icon: "text-cyan-400",    glow: "shadow-[0_0_20px_rgba(6,182,212,0.08)]",  border: "border-cyan-500/20" },
-  gray:    { icon: "text-gray-400",    glow: "",                                          border: "border-border" },
+  gray:    { icon: "text-muted-foreground",    glow: "",                                          border: "border-border" },
 }
 
 export default function Panel({
@@ -68,10 +68,10 @@ export default function Panel({
         onClick={collapsible ? () => setOpen(!open) : undefined}
       >
         {Icon && <Icon className={cn("w-4 h-4 shrink-0", colors.icon)} />}
-        <span className="text-sm font-semibold text-gray-200 flex-1 tracking-wide">{title}</span>
+        <span className="text-sm font-semibold text-foreground flex-1 tracking-wide">{title}</span>
 
         {badge !== undefined && (
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-border">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border">
             {badge}
           </span>
         )}
@@ -81,7 +81,7 @@ export default function Panel({
             key={i}
             title={action.label}
             onClick={(e) => { e.stopPropagation(); action.onClick() }}
-            className="w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 text-gray-500 hover:text-gray-300 transition-colors"
+            className="w-6 h-6 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             <action.icon className="w-3.5 h-3.5" />
           </button>
@@ -90,7 +90,7 @@ export default function Panel({
         {collapsible && (
           <ChevronDown
             className={cn(
-              "w-4 h-4 text-gray-500 transition-transform duration-200",
+              "w-4 h-4 text-muted-foreground transition-transform duration-200",
               !open && "-rotate-90"
             )}
           />

@@ -59,10 +59,10 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <Eye className="w-4 h-4 text-purple-400" />
-          <span className="text-sm font-medium text-gray-300">Watch Window</span>
+          <span className="text-sm font-medium text-foreground">Watch Window</span>
         </div>
         <Plus 
-          className="w-4 h-4 text-gray-500 hover:text-white cursor-pointer" 
+          className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-pointer" 
           onClick={() => setIsAdding(true)}
         />
       </div>
@@ -71,13 +71,13 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
         {expressions.map((expr, idx) => (
           <div 
             key={idx}
-            className="flex items-center justify-between px-3 py-1.5 rounded text-xs font-mono border bg-muted/50 border-border text-gray-400 group"
+            className="flex items-center justify-between px-3 py-1.5 rounded text-xs font-mono border bg-muted/50 border-border text-muted-foreground group"
           >
-            <span className="text-white/80">{expr}</span>
+            <span className="text-foreground/80">{expr}</span>
             <div className="flex items-center gap-2">
-              <span className="text-white font-semibold">{evaluateWatch(expr)}</span>
+              <span className="text-foreground font-semibold">{evaluateWatch(expr)}</span>
               <X 
-                className="w-3 h-3 text-gray-600 hover:text-red-400 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" 
+                className="w-3 h-3 text-muted-foreground/70 hover:text-red-400 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" 
                 onClick={() => handleRemove(idx)}
               />
             </div>
@@ -85,7 +85,7 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
         ))}
         
         {isAdding && (
-          <div className="flex items-center px-2 py-1 bg-white/[0.05] rounded border border-border/60">
+          <div className="flex items-center px-2 py-1 bg-muted/50 rounded border border-border/60">
             <input
               autoFocus
               type="text"
@@ -103,7 +103,7 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
                 else setIsAdding(false)
               }}
               placeholder="e.g. A, HL, 2050H"
-              className="bg-transparent w-full text-xs font-mono text-white outline-none"
+              className="bg-transparent w-full text-xs font-mono text-foreground outline-none"
             />
           </div>
         )}

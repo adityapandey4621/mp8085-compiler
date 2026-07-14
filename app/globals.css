@@ -3,88 +3,109 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   LIGHT THEME — Clean, readable, professional
+   ============================================================ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.97 0 0);
+  --foreground: oklch(0.12 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.12 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.12 0 0);
+  --primary: oklch(0.45 0.2 264);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.93 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.92 0.05 264);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.54 0.22 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.85 0 0);
+  --input: oklch(0.88 0 0);
+  --ring: oklch(0.45 0.2 264);
+  --radius: 0.6rem;
+
+  /* Chart */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
 
-  /* Custom neon colors */
-  --neon-blue: #4a90e2;
-  --neon-cyan: #00f5ff;
-  --neon-green: #2affae;
-  --neon-purple: #a66cff;
-  --neon-red: #ff3b3b;
+  /* Sidebar */
+  --sidebar: oklch(0.95 0 0);
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.45 0.2 264);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.9 0.03 264);
+  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-border: oklch(0.85 0 0);
+  --sidebar-ring: oklch(0.45 0.2 264);
+
+  /* Custom neon colors (muted for light) */
+  --neon-blue: #3b82f6;
+  --neon-cyan: #06b6d4;
+  --neon-green: #22c55e;
+  --neon-purple: #a855f7;
+  --neon-red: #ef4444;
 }
 
-/* Dark theme with deep black neon aesthetic for 8085 Simulator */
+/* ============================================================
+   DARK THEME — Deep black neon aesthetic for 8085 Simulator
+   ============================================================ */
 .dark {
-  --background: #050505;
-  --foreground: #ffffff;
-  --card: #0a0a0f;
-  --card-foreground: #ffffff;
-  --popover: #0a0a0f;
-  --popover-foreground: #ffffff;
+  --background: #050508;
+  --foreground: #e8eaf0;
+  --card: #0d0d14;
+  --card-foreground: #e8eaf0;
+  --popover: #0d0d14;
+  --popover-foreground: #e8eaf0;
   --primary: #4a90e2;
   --primary-foreground: #ffffff;
-  --secondary: #1a1a2e;
-  --secondary-foreground: #ffffff;
-  --muted: #1a1a2e;
-  --muted-foreground: #888888;
-  --accent: #00f5ff;
-  --accent-foreground: #050505;
-  --destructive: #ff6b6b;
+  --secondary: #16162a;
+  --secondary-foreground: #c8cad4;
+  --muted: #16162a;
+  --muted-foreground: #7878a0;
+  --accent: #00d4ff;
+  --accent-foreground: #050508;
+  --destructive: #ff5555;
   --destructive-foreground: #ffffff;
-  --border: #1a1a2e;
+  --border: rgba(255,255,255,0.07);
   --input: #1a1a2e;
   --ring: #4a90e2;
+
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: #0a0a0f;
-  --sidebar-foreground: #ffffff;
+
+  --sidebar: #0d0d14;
+  --sidebar-foreground: #c8cad4;
   --sidebar-primary: #4a90e2;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a2e;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1a1a2e;
+  --sidebar-accent: #16162a;
+  --sidebar-accent-foreground: #c8cad4;
+  --sidebar-border: rgba(255,255,255,0.07);
   --sidebar-ring: #4a90e2;
+
+  --neon-blue: #4a90e2;
+  --neon-cyan: #00d4ff;
+  --neon-green: #2affae;
+  --neon-purple: #a66cff;
+  --neon-red: #ff5555;
 }
 
+/* ============================================================
+   THEME TOKEN WIRING
+   ============================================================ */
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -123,203 +144,173 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ============================================================
+   BASE
+   ============================================================ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+
+  /* ── Headings ── */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground font-semibold;
+  }
+
+  /* ── Links ── */
+  a {
+    @apply text-primary;
+  }
+
+  /* ── Form inputs ── */
+  input, textarea, select {
+    @apply text-foreground bg-input;
+  }
+
+  /* ── Code/mono ── */
+  code, kbd, pre, .font-mono {
+    font-family: var(--font-mono);
   }
 }
 
-/* Custom scrollbar for neon theme */
+/* ============================================================
+   SCROLLBARS — theme-aware
+   ============================================================ */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
-::-webkit-scrollbar-track {
-  background: #0a0a0f;
-}
+:root ::-webkit-scrollbar-track  { background: oklch(0.93 0 0); }
+:root ::-webkit-scrollbar-thumb  { background: oklch(0.78 0 0); border-radius: 4px; }
+:root ::-webkit-scrollbar-thumb:hover { background: oklch(0.65 0 0); }
 
-::-webkit-scrollbar-thumb {
-  background: #1a1a2e;
-  border-radius: 3px;
-}
+.dark ::-webkit-scrollbar-track  { background: #0d0d14; }
+.dark ::-webkit-scrollbar-thumb  { background: #1e1e30; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #2e2e48; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #2a2a3e;
-}
-
-/* Noise texture overlay */
-.noise-bg::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.03;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
-/* Added custom CSS animations to replace framer-motion */
-
-/* Fade in animation */
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+.animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
 
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
-}
-
-/* Slide down animation */
 @keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+.animate-slide-down { animation: slide-down 0.3s ease-out forwards; }
 
-.animate-slide-down {
-  animation: slide-down 0.4s ease-out forwards;
-}
-
-/* Slide right animation */
-@keyframes slide-right {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-right {
-  animation: slide-right 0.4s ease-out forwards;
-}
-
-/* Slide left animation */
-@keyframes slide-left {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-left {
-  animation: slide-left 0.4s ease-out forwards;
-}
-
-/* Slide up animation */
 @keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+.animate-slide-up { animation: slide-up 0.3s ease-out forwards; }
 
-.animate-slide-up {
-  animation: slide-up 0.4s ease-out forwards;
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
+.animate-slide-right { animation: slide-right 0.3s ease-out forwards; }
 
-/* Scale in animation */
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-left { animation: slide-left 0.3s ease-out forwards; }
+
 @keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
 }
+.animate-scale-in { animation: scale-in 0.25s ease-out forwards; }
 
-.animate-scale-in {
-  animation: scale-in 0.4s ease-out forwards;
-}
-
-/* Blink animation for cursor */
 @keyframes blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  51%,
-  100% {
-    opacity: 0;
-  }
+  0%, 50%  { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
+.animate-blink { animation: blink 0.8s infinite; }
 
-.animate-blink {
-  animation: blink 0.8s infinite;
-}
-
-/* Neon button hover effect */
-.neon-button {
+/* ============================================================
+   NEON EFFECTS (dark mode only)
+   ============================================================ */
+.dark .neon-button {
   transition: all 0.2s ease;
 }
-
-.neon-button:hover {
-  box-shadow: 0 0 20px color-mix(in srgb, var(--neon-color, #4a90e2) 40%, transparent), 0 0 40px
-    color-mix(in srgb, var(--neon-color, #4a90e2) 20%, transparent);
+.dark .neon-button:hover {
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--neon-color, #4a90e2) 40%, transparent),
+    0 0 32px color-mix(in srgb, var(--neon-color, #4a90e2) 20%, transparent);
   border-color: var(--neon-color, #4a90e2);
 }
 
-/* Compact Mode Overrides */
-.compact-mode .p-4 { padding: 0.5rem; }
-.compact-mode .py-2 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-.compact-mode .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.compact-mode .px-4 { padding-left: 0.5rem; padding-right: 0.5rem; }
+/* ============================================================
+   COMPACT MODE
+   ============================================================ */
+.compact-mode .p-4   { padding: 0.5rem; }
+.compact-mode .py-2  { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.compact-mode .py-3  { padding-top: 0.375rem; padding-bottom: 0.375rem; }
 .compact-mode .gap-4 { gap: 0.5rem; }
-.compact-mode .h-14 { height: 2.5rem; }
+.compact-mode .h-14  { height: 2.5rem; }
 .compact-mode .text-sm { font-size: 0.75rem; line-height: 1rem; }
 .compact-mode th, .compact-mode td { padding: 0.125rem !important; }
 
+/* ============================================================
+   ACCENT COLOR SYSTEM
+   ============================================================ */
+[data-accent="blue"]   { --primary: #3b82f6; --ring: #3b82f6; }
+[data-accent="green"]  { --primary: #22c55e; --ring: #22c55e; }
+[data-accent="purple"] { --primary: #a855f7; --ring: #a855f7; }
+[data-accent="orange"] { --primary: #f97316; --ring: #f97316; }
 
-/* Accent Colors */
-[data-accent="blue"] {
-  --primary: #4a90e2;
-  --ring: #4a90e2;
+/* ============================================================
+   LIGHT THEME — text contrast fixes for simulator UI panels
+   The simulator uses hardcoded dark colors; in light mode we
+   need to make these elements still readable.
+   ============================================================ */
+
+/* Control bar inputs in light mode */
+:root .font-mono { color: var(--foreground); }
+
+/* Resizable handle visibility */
+:root [data-panel-resize-handle-id] {
+  background: oklch(0.82 0 0);
 }
-[data-accent="green"] {
-  --primary: #22c55e;
-  --ring: #22c55e;
-}
-[data-accent="purple"] {
-  --primary: #a855f7;
-  --ring: #a855f7;
-}
-[data-accent="orange"] {
-  --primary: #f97316;
-  --ring: #f97316;
+.dark [data-panel-resize-handle-id] {
+  background: rgba(255,255,255,0.05);
 }
 
-/* Ensure buttons have high contrast */
-.dark .text-gray-400 { color: #a1a1aa; }
-.dark .text-gray-500 { color: #71717a; }
-.dark .bg-black\/40 { background-color: rgba(0,0,0,0.6); }
+/* ============================================================
+   SETTINGS DIALOG BACKDROP
+   ============================================================ */
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fade-in 0.15s ease-out forwards;
+}
 
+/* ============================================================
+   CUSTOM SCROLLBAR for panel interiors
+   ============================================================ */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+:root .custom-scrollbar::-webkit-scrollbar-thumb { background: oklch(0.75 0 0); border-radius: 4px; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e1e30; border-radius: 4px; }

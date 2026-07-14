@@ -49,7 +49,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Circuit Background */}
       <div className="fixed inset-0 opacity-[0.03] pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -77,18 +77,18 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-              <Cpu className="w-5 h-5 text-white" />
+              <Cpu className="w-5 h-5 text-foreground" />
             </div>
             <span className="text-xl font-semibold tracking-tight">MP8085</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
-            <a href="#about" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <a href="#about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               About
             </a>
-            <a href="https://github.com" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <a href="https://github.com" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               GitHub
             </a>
           </div>
@@ -97,11 +97,11 @@ export default function LandingPage() {
               variant="ghost"
               size="sm"
               onClick={() => openAuth("login")}
-              className="text-gray-300 hover:text-white"
+              className="text-foreground hover:text-foreground"
             >
               Log in
             </Button>
-            <Button size="sm" onClick={() => openAuth("signup")} className="bg-blue-600 hover:bg-blue-500 text-white">
+            <Button size="sm" onClick={() => openAuth("signup")} className="bg-blue-600 hover:bg-blue-500 text-foreground">
               Sign up
             </Button>
           </div>
@@ -121,7 +121,7 @@ export default function LandingPage() {
               8085 Simulator
             </span>
           </h1>
-          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto text-pretty leading-relaxed">
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto text-pretty leading-relaxed">
             A cloud-based, visualization-rich emulator for students and engineers. Write, debug, and understand 8085
             assembly like never before.
           </p>
@@ -129,7 +129,7 @@ export default function LandingPage() {
             <Button
               size="lg"
               onClick={() => openAuth("signup")}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 text-base gap-2 group"
+              className="bg-blue-600 hover:bg-blue-500 text-foreground px-8 h-12 text-base gap-2 group"
             >
               Start Simulation
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -138,7 +138,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-gray-700 hover:border-gray-600 hover:bg-white/5 px-8 h-12 text-base gap-2 bg-transparent"
+                className="border-gray-700 hover:border-gray-600 hover:bg-muted/50 px-8 h-12 text-base gap-2 bg-transparent"
               >
                 <Play className="w-4 h-4" />
                 Try Demo
@@ -155,13 +155,13 @@ export default function LandingPage() {
                 <div className="w-3 h-3 rounded-full bg-red-500/80" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
                 <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                <span className="ml-4 text-xs text-gray-500 font-mono">simulator.mp8085.app</span>
+                <span className="ml-4 text-xs text-muted-foreground font-mono">simulator.mp8085.app</span>
               </div>
               <div className="aspect-[16/9] bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#0a0a0f] flex items-center justify-center">
                 <div className="grid grid-cols-3 gap-4 p-8 w-full max-w-4xl opacity-60">
-                  <div className="bg-white/5 rounded-lg h-48 border border-border/60" />
-                  <div className="bg-white/5 rounded-lg h-48 border border-border/60" />
-                  <div className="bg-white/5 rounded-lg h-48 border border-border/60" />
+                  <div className="bg-muted/50 rounded-lg h-48 border border-border/60" />
+                  <div className="bg-muted/50 rounded-lg h-48 border border-border/60" />
+                  <div className="bg-muted/50 rounded-lg h-48 border border-border/60" />
                 </div>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function LandingPage() {
       <section id="about" className="relative z-10 py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">What is MP8085?</h2>
-          <p className="text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
             MP8085 is a next-generation cloud-based microprocessor simulator designed specifically for the Intel 8085
             architecture. Whether you're a computer science student learning assembly language or an engineer debugging
             embedded systems, MP8085 provides an intuitive, visualization-rich environment to write, test, and
@@ -183,17 +183,17 @@ export default function LandingPage() {
           <div className="flex items-center justify-center gap-8 mt-12">
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-400">50+</div>
-              <div className="text-sm text-gray-500 mt-1">Instructions</div>
+              <div className="text-sm text-muted-foreground mt-1">Instructions</div>
             </div>
-            <div className="w-px h-12 bg-white/10" />
+            <div className="w-px h-12 bg-muted" />
             <div className="text-center">
               <div className="text-4xl font-bold text-cyan-400">64KB</div>
-              <div className="text-sm text-gray-500 mt-1">Memory</div>
+              <div className="text-sm text-muted-foreground mt-1">Memory</div>
             </div>
-            <div className="w-px h-12 bg-white/10" />
+            <div className="w-px h-12 bg-muted" />
             <div className="text-center">
               <div className="text-4xl font-bold text-emerald-400">Real-time</div>
-              <div className="text-sm text-gray-500 mt-1">Visualization</div>
+              <div className="text-sm text-muted-foreground mt-1">Visualization</div>
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               Everything you need to master 8085 assembly programming in one place.
             </p>
           </div>
@@ -219,7 +219,7 @@ export default function LandingPage() {
                   <feature.icon className="w-6 h-6 text-blue-400" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -231,13 +231,13 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-3xl text-center">
           <Layers className="w-12 h-12 text-blue-400 mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to start learning?</h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Join thousands of students and engineers using MP8085 to master microprocessor programming.
           </p>
           <Button
             size="lg"
             onClick={() => openAuth("signup")}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 text-base gap-2 group"
+            className="bg-blue-600 hover:bg-blue-500 text-foreground px-8 h-12 text-base gap-2 group"
           >
             Get Started Free
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -250,11 +250,11 @@ export default function LandingPage() {
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-              <Cpu className="w-4 h-4 text-white" />
+              <Cpu className="w-4 h-4 text-foreground" />
             </div>
             <span className="font-medium">MP8085</span>
           </div>
-          <div className="text-sm text-gray-500">Built for education. Open for everyone.</div>
+          <div className="text-sm text-muted-foreground">Built for education. Open for everyone.</div>
           <div className="flex items-center gap-4">
             {/* Social links removed */}
           </div>

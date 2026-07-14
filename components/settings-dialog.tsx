@@ -2,15 +2,71 @@
 
 import { useSettings } from "@/components/settings-provider"
 import { useTheme } from "next-themes"
-import { Settings, Palette, Code2, Cpu, Bug, Layout, Moon, Sun, Monitor, X } from "lucide-react"
-import { Rnd } from "react-rnd"
+import {
+  Settings, Palette, Code2, Cpu, Bug, Layout,
+  Moon, Sun, Monitor, X, Check
+} from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 
-export default function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+/* ── Sidebar nav items ───────────────────────────────────────────────── */
+type Tab = "appearance" | "editor" | "engine" | "debugging" | "interface"
+
+const NAV: { id: Tab; label: string; icon: React.ElementType }[] = [
+  { id: "appearance", label: "Appearance", icon: Palette },
+  { id: "editor",     label: "Editor",     icon: Code2   },
+  { id: "engine",     label: "Engine",     icon: Cpu     },
+  { id: "debugging",  label: "Debugging",  icon: Bug     },
+  { id: "interface",  label: "Interface",  icon: Layout  },
+]
+
+/* ── Small reusable pieces ───────────────────────────────────────────── */
+function SettingRow({
+  label,
+  description,
+  children,
+  disabled,
+}: {
+  label: string
+  description?: string
+  children: React.ReactNode
+  disabled?: boolean
+}) {
+  return (
+    <div className={cn(
+      "flex items-center justify-between gap-4 py-3 border-b border-border/50 last:border-0",
+      disabled && "opacity-50 cursor-not-allowed pointer-events-none"
+    )}>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-foreground leading-tight">{label}</p>
+        {description && (
+          <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{description}</p>
+        )}
+      </div>
+      <div className="shrink-0">{children}</div>
+    </div>
+  )
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4 mt-1">
+      {children}
+    </h3>
+  )
+}
+
+/* ── Main Component ──────────────────────────────────────────────────── */
+export default function SettingsDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
   const { theme, setTheme } = useTheme()
   const {
     accentColor, setAccentColor,
@@ -21,201 +77,278 @@ export default function SettingsDialog({ open, onOpenChange }: { open: boolean, 
     autoReset, setAutoReset,
     highlightRegisters, setHighlightRegisters,
     showInstructionTrace, setShowInstructionTrace,
-    compactMode, setCompactMode
+    compactMode, setCompactMode,
   } = useSettings()
 
-  if (!open) return null;
+  const [activeTab, setActiveTab] = useState<Tab>("appearance")
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false)
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [open, onOpenChange])
+
+  // Lock body scroll
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => { document.body.style.overflow = "" }
+  }, [open])
+
+  if (!open) return null
+
+  const ACCENT_COLORS = [
+    { id: "blue",   label: "Blue",   cls: "bg-blue-500"   },
+    { id: "green",  label: "Green",  cls: "bg-green-500"  },
+    { id: "purple", label: "Purple", cls: "bg-purple-500" },
+    { id: "orange", label: "Orange", cls: "bg-orange-500" },
+  ]
+
+  const FONT_SIZES = [
+    { value: 12, label: "Small",  sub: "12px" },
+    { value: 14, label: "Medium", sub: "14px" },
+    { value: 16, label: "Large",  sub: "16px" },
+  ]
 
   return (
-    <Rnd
-      default={{
-        x: typeof window !== 'undefined' ? window.innerWidth / 2 - 400 : 100,
-        y: typeof window !== 'undefined' ? window.innerHeight / 2 - 250 : 100,
-        width: 800,
-        height: 500,
-      }}
-      minWidth={500}
-      minHeight={300}
-      bounds="window"
-      dragHandleClassName="settings-drag-handle"
-      className="z-[100] bg-background border border-border shadow-2xl rounded-xl overflow-hidden flex flex-col"
+    /* Backdrop */
+    <div
+      className="settings-backdrop"
+      onClick={(e) => { if (e.target === e.currentTarget) onOpenChange(false) }}
     >
-      {/* Top Title Bar - Drag Handle */}
-      <div className="settings-drag-handle h-12 bg-muted/50 border-b border-border flex items-center justify-between px-4 cursor-move shrink-0">
-        <h2 className="text-sm font-semibold flex items-center gap-2 pointer-events-none">
-          <Settings className="w-4 h-4 text-muted-foreground" />
-          Settings
-        </h2>
-        <button onClick={() => onOpenChange(false)} className="text-muted-foreground hover:text-foreground cursor-pointer">
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      <Tabs defaultValue="appearance" orientation="vertical" className="flex flex-row flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-48 sm:w-56 bg-muted/30 border-r border-border flex flex-col shrink-0">
-          <TabsList className="flex flex-col h-full bg-transparent p-2 justify-start items-stretch space-y-1">
-              <TabsTrigger value="appearance" className="justify-start gap-2 text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">
-                <Palette className="w-4 h-4" /> Appearance
-              </TabsTrigger>
-              <TabsTrigger value="editor" className="justify-start gap-2 text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">
-                <Code2 className="w-4 h-4" /> Editor
-              </TabsTrigger>
-              <TabsTrigger value="engine" className="justify-start gap-2 text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">
-                <Cpu className="w-4 h-4" /> Engine
-              </TabsTrigger>
-              <TabsTrigger value="debugging" className="justify-start gap-2 text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">
-                <Bug className="w-4 h-4" /> Debugging
-              </TabsTrigger>
-              <TabsTrigger value="interface" className="justify-start gap-2 text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">
-                <Layout className="w-4 h-4" /> Interface
-              </TabsTrigger>
-            </TabsList>
+      {/* Dialog Box */}
+      <div
+        className={cn(
+          "relative w-full max-w-2xl max-h-[90vh] flex flex-col",
+          "bg-background border border-border rounded-xl shadow-2xl",
+          "animate-scale-in overflow-hidden"
+        )}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Settings"
+      >
+        {/* ── Title Bar ─────────────────────────────────────────────── */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+          <div className="flex items-center gap-2.5">
+            <Settings className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground">Settings</h2>
           </div>
-
-          {/* Content Area */}
-          <div className="flex-1 overflow-y-auto p-6 bg-background">
-            {/* Appearance Tab */}
-            <TabsContent value="appearance" className="space-y-8 mt-0 outline-none w-full">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Appearance</h3>
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <Label className="text-sm text-muted-foreground">Theme</Label>
-                    <div className="flex gap-2">
-                      <Button variant={theme === 'light' ? 'default' : 'outline'} size="sm" onClick={() => setTheme('light')} className="flex-1 gap-2">
-                        <Sun className="w-4 h-4" /> Light
-                      </Button>
-                      <Button variant={theme === 'dark' ? 'default' : 'outline'} size="sm" onClick={() => setTheme('dark')} className="flex-1 gap-2">
-                        <Moon className="w-4 h-4" /> Dark
-                      </Button>
-                      <Button variant={theme === 'system' ? 'default' : 'outline'} size="sm" onClick={() => setTheme('system')} className="flex-1 gap-2">
-                        <Monitor className="w-4 h-4" /> System
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <Label className="text-sm text-muted-foreground">Accent Color</Label>
-                    <div className="flex gap-2">
-                      {['blue', 'green', 'purple', 'orange'].map(color => (
-                        <Button 
-                          key={color}
-                          variant="outline" 
-                          onClick={() => setAccentColor(color)}
-                          className={`flex-1 capitalize ${accentColor === color ? 'border-primary ring-1 ring-primary' : ''}`}
-                        >
-                          <div className={`w-3 h-3 rounded-full mr-2 bg-${color}-500`}></div>
-                          {color}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Editor Tab */}
-            <TabsContent value="editor" className="space-y-8 mt-0 outline-none w-full">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Editor</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Auto Uppercase Mnemonics</Label>
-                      <p className="text-xs text-muted-foreground">Automatically convert mvi to MVI while typing</p>
-                    </div>
-                    <Switch checked={autoUppercase} onCheckedChange={setAutoUppercase} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Syntax Highlighting</Label>
-                      <p className="text-xs text-muted-foreground">Enable colors for instructions and registers</p>
-                    </div>
-                    <Switch checked={syntaxHighlighting} onCheckedChange={setSyntaxHighlighting} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Auto Save Code</Label>
-                      <p className="text-xs text-muted-foreground">Saves the current program automatically</p>
-                    </div>
-                    <Switch checked={autoSave} onCheckedChange={setAutoSave} />
-                  </div>
-                  <div className="space-y-3 pt-2">
-                    <Label className="text-sm text-muted-foreground">Font Size</Label>
-                    <div className="flex gap-2">
-                      <Button variant={fontSize === 12 ? 'default' : 'outline'} size="sm" onClick={() => setFontSize(12)} className="flex-1">Small (12px)</Button>
-                      <Button variant={fontSize === 14 ? 'default' : 'outline'} size="sm" onClick={() => setFontSize(14)} className="flex-1">Medium (14px)</Button>
-                      <Button variant={fontSize === 16 ? 'default' : 'outline'} size="sm" onClick={() => setFontSize(16)} className="flex-1">Large (16px)</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Engine Tab */}
-            <TabsContent value="engine" className="space-y-8 mt-0 outline-none w-full">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Engine</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Auto Reset Before Run</Label>
-                      <p className="text-xs text-muted-foreground">Pressing Run automatically resets the CPU first</p>
-                    </div>
-                    <Switch checked={autoReset} onCheckedChange={setAutoReset} />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Debugging Tab */}
-            <TabsContent value="debugging" className="space-y-8 mt-0 outline-none w-full">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Debugging</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Highlight Changed Registers</Label>
-                      <p className="text-xs text-muted-foreground">Briefly highlight registers when their value changes</p>
-                    </div>
-                    <Switch checked={highlightRegisters} onCheckedChange={setHighlightRegisters} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Instruction Trace</Label>
-                      <p className="text-xs text-muted-foreground">Show the execution history panel</p>
-                    </div>
-                    <Switch checked={showInstructionTrace} onCheckedChange={setShowInstructionTrace} />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Interface Tab */}
-            <TabsContent value="interface" className="space-y-8 mt-0 outline-none w-full">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Interface</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between opacity-50 cursor-not-allowed">
-                    <div className="space-y-0.5">
-                      <Label>Restore Last Workspace</Label>
-                      <p className="text-xs text-muted-foreground">Reopen the layout exactly as you left it (Always On)</p>
-                    </div>
-                    <Switch checked={true} disabled={true} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Compact Mode</Label>
-                      <p className="text-xs text-muted-foreground">Reduce spacing to fit more on screen</p>
-                    </div>
-                    <Switch checked={compactMode} onCheckedChange={setCompactMode} />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Close settings"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-      </Tabs>
-    </Rnd>
+
+        {/* ── Body: Sidebar + Content ────────────────────────────────── */}
+        <div className="flex flex-1 overflow-hidden min-h-0">
+
+          {/* Sidebar */}
+          <nav className="w-44 shrink-0 border-r border-border bg-muted/30 p-2 flex flex-col gap-0.5 overflow-y-auto">
+            {NAV.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={cn(
+                  "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left text-sm transition-all",
+                  activeTab === id
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                )}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Content area */}
+          <div className="flex-1 overflow-y-auto p-6">
+
+            {/* ── APPEARANCE ────────────────────────────────────────── */}
+            {activeTab === "appearance" && (
+              <div>
+                <SectionTitle>Appearance</SectionTitle>
+
+                {/* Theme */}
+                <div className="mb-6">
+                  <Label className="text-sm font-medium text-foreground mb-3 block">Theme</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "light",  label: "Light",  Icon: Sun     },
+                      { id: "dark",   label: "Dark",   Icon: Moon    },
+                      { id: "system", label: "System", Icon: Monitor },
+                    ].map(({ id, label, Icon }) => (
+                      <button
+                        key={id}
+                        onClick={() => setTheme(id)}
+                        className={cn(
+                          "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all text-sm font-medium",
+                          theme === id
+                            ? "border-primary bg-primary/8 text-primary"
+                            : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground hover:bg-muted/40"
+                        )}
+                      >
+                        <Icon className="w-5 h-5" />
+                        {label}
+                        {theme === id && (
+                          <span className="absolute top-1.5 right-1.5">
+                            <Check className="w-3 h-3 text-primary" />
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Accent Color */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-3 block">Accent Color</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {ACCENT_COLORS.map(({ id, label, cls }) => (
+                      <button
+                        key={id}
+                        onClick={() => setAccentColor(id)}
+                        className={cn(
+                          "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-xs font-medium",
+                          accentColor === id
+                            ? "border-primary bg-primary/8 text-foreground"
+                            : "border-border text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground"
+                        )}
+                      >
+                        <span className={cn("w-5 h-5 rounded-full", cls)} />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── EDITOR ────────────────────────────────────────────── */}
+            {activeTab === "editor" && (
+              <div>
+                <SectionTitle>Editor</SectionTitle>
+
+                <SettingRow
+                  label="Auto Uppercase Mnemonics"
+                  description="Automatically convert mvi → MVI while typing"
+                >
+                  <Switch checked={autoUppercase} onCheckedChange={setAutoUppercase} />
+                </SettingRow>
+
+                <SettingRow
+                  label="Syntax Highlighting"
+                  description="Color instructions, registers, and hex values"
+                >
+                  <Switch checked={syntaxHighlighting} onCheckedChange={setSyntaxHighlighting} />
+                </SettingRow>
+
+                <SettingRow
+                  label="Auto Save Code"
+                  description="Saves program to localStorage automatically"
+                >
+                  <Switch checked={autoSave} onCheckedChange={setAutoSave} />
+                </SettingRow>
+
+                {/* Font Size */}
+                <div className="pt-3">
+                  <Label className="text-sm font-medium text-foreground mb-3 block">Font Size</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {FONT_SIZES.map(({ value, label, sub }) => (
+                      <button
+                        key={value}
+                        onClick={() => setFontSize(value)}
+                        className={cn(
+                          "flex flex-col items-center gap-0.5 py-3 px-2 rounded-lg border-2 transition-all",
+                          fontSize === value
+                            ? "border-primary bg-primary/8 text-primary"
+                            : "border-border text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground"
+                        )}
+                      >
+                        <span className="text-sm font-semibold">{label}</span>
+                        <span className="text-xs opacity-70">{sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── ENGINE ────────────────────────────────────────────── */}
+            {activeTab === "engine" && (
+              <div>
+                <SectionTitle>Engine</SectionTitle>
+                <SettingRow
+                  label="Auto Reset Before Run"
+                  description="Pressing Run automatically resets the CPU state first"
+                >
+                  <Switch checked={autoReset} onCheckedChange={setAutoReset} />
+                </SettingRow>
+              </div>
+            )}
+
+            {/* ── DEBUGGING ─────────────────────────────────────────── */}
+            {activeTab === "debugging" && (
+              <div>
+                <SectionTitle>Debugging</SectionTitle>
+                <SettingRow
+                  label="Highlight Changed Registers"
+                  description="Flash registers briefly when their value changes"
+                >
+                  <Switch checked={highlightRegisters} onCheckedChange={setHighlightRegisters} />
+                </SettingRow>
+                <SettingRow
+                  label="Instruction Trace Panel"
+                  description="Show the execution history tab in the console dock"
+                >
+                  <Switch checked={showInstructionTrace} onCheckedChange={setShowInstructionTrace} />
+                </SettingRow>
+              </div>
+            )}
+
+            {/* ── INTERFACE ─────────────────────────────────────────── */}
+            {activeTab === "interface" && (
+              <div>
+                <SectionTitle>Interface</SectionTitle>
+                <SettingRow
+                  label="Restore Last Workspace"
+                  description="Reopen layout exactly as you left it (always on)"
+                  disabled
+                >
+                  <Switch checked disabled />
+                </SettingRow>
+                <SettingRow
+                  label="Compact Mode"
+                  description="Reduce spacing to fit more panels on smaller screens"
+                >
+                  <Switch checked={compactMode} onCheckedChange={setCompactMode} />
+                </SettingRow>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Footer ────────────────────────────────────────────────── */}
+        <div className="shrink-0 flex items-center justify-end px-5 py-3 border-t border-border bg-muted/20">
+          <Button
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            className="h-8 px-5 text-sm"
+          >
+            Done
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
-

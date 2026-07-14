@@ -29,7 +29,7 @@ export default function ProgramCounter({ pc, onSetPC }: ProgramCounterProps) {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Crosshair className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-medium text-gray-300">Program Counter</span>
+        <span className="text-sm font-medium text-foreground">Program Counter</span>
       </div>
 
       <div className="p-3 flex items-center justify-between gap-3">
@@ -39,10 +39,10 @@ export default function ProgramCounter({ pc, onSetPC }: ProgramCounterProps) {
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value.toUpperCase().replace(/[^0-9A-F]/g, '').slice(0, 4))}
             onKeyDown={(e) => e.key === 'Enter' && handleJump()}
-            className="w-full bg-white/[0.03] border border-border/60 rounded px-3 py-1.5 text-cyan-400 font-mono text-sm focus:outline-none focus:border-cyan-500/50 pr-6"
+            className="w-full bg-muted/50 border border-border/60 rounded px-3 py-1.5 text-cyan-400 font-mono text-sm focus:outline-none focus:border-cyan-500/50 pr-6"
             placeholder="0000"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none">H</span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">H</span>
         </div>
         <button
           onClick={handleJump}

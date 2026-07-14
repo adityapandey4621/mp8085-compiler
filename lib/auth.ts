@@ -15,27 +15,31 @@ declare module "next-auth" {
     }
 }
 
-export const authOptions: NextAuthOptions = {
-    adapter: PrismaAdapter(prisma),
-    session: {
-        strategy: "jwt",
-    },
-    providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID || "",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-        }),
-        CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-                usernameOrEmail: { label: "Username or Email", type: "text" },
-                password: { label: "Password", type: "password" }
-            },
-            async authorize(credentials) {
-                if (!credentials?.usernameOrEmail || !credentials?.password) {
-                    throw new Error("Missing credentials")
-                }
+// Build providers list dynamically — only add Google if credentials are set
+const providers: NextAuthOptions["providers"] = []
 
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    providers.push(
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        })
+    )
+}
+
+providers.push(
+    CredentialsProvider({
+        name: "Credentials",
+        credentials: {
+            usernameOrEmail: { label: "Username or Email", type: "text" },
+            password: { label: "Password", type: "password" }
+        },
+        async authorize(credentials) {
+            if (!credentials?.usernameOrEmail || !credentials?.password) {
+                throw new Error("Missing credentials")
+            }
+
+            try {
                 // Check if user exists by email or username
                 const user = await prisma.user.findFirst({
                     where: {
@@ -64,9 +68,25 @@ export const authOptions: NextAuthOptions = {
                     username: user.username,
                     role: user.role
                 } as any
+            } catch (error: any) {
+                // Re-throw auth errors, wrap DB errors
+                if (error.message === "Invalid credentials" || error.message === "Missing credentials") {
+                    throw error
+                }
+                console.error("[auth] DB error during authorize:", error)
+                throw new Error("Authentication service unavailable")
             }
-        })
-    ],
+        }
+    })
+)
+
+export const authOptions: NextAuthOptions = {
+    // Only use PrismaAdapter when DB is available
+    adapter: PrismaAdapter(prisma),
+    session: {
+        strategy: "jwt",
+    },
+    providers,
     callbacks: {
         async jwt({ token, user, trigger, session }) {
             if (user) {

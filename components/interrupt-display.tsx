@@ -31,7 +31,7 @@ export default function InterruptDisplay({
             {/* Header */}
             <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
                 <Zap className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm font-medium text-gray-300">Interrupts & Serial I/O</span>
+                <span className="text-sm font-medium text-foreground">Interrupts & Serial I/O</span>
             </div>
 
             <div className="p-4 space-y-4">
@@ -39,16 +39,16 @@ export default function InterruptDisplay({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${interruptsEnabled ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-red-500"}`} />
-                        <span className="text-xs font-medium text-gray-400">Interrupts (IE)</span>
+                        <span className="text-xs font-medium text-muted-foreground">Interrupts (IE)</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-gray-500 uppercase">SID</span>
-                            <span className={`font-mono text-xs ${serialInput ? "text-green-400" : "text-gray-600"}`}>{serialInput}</span>
+                            <span className="text-[10px] text-muted-foreground uppercase">SID</span>
+                            <span className={`font-mono text-xs ${serialInput ? "text-green-400" : "text-muted-foreground/70"}`}>{serialInput}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-gray-500 uppercase">SOD</span>
-                            <span className={`font-mono text-xs ${serialOutput ? "text-green-400" : "text-gray-600"}`}>{serialOutput}</span>
+                            <span className="text-[10px] text-muted-foreground uppercase">SOD</span>
+                            <span className={`font-mono text-xs ${serialOutput ? "text-green-400" : "text-muted-foreground/70"}`}>{serialOutput}</span>
                         </div>
                     </div>
                 </div>
@@ -69,7 +69,7 @@ export default function InterruptDisplay({
                                                 ? "bg-yellow-500/20 border-yellow-500/40 shadow-[0_0_10px_rgba(234,179,8,0.2)]"
                                                 : "bg-muted/50 border-border"}
                     `}>
-                                            <span className="text-[10px] font-bold text-gray-400 mb-1">{intr.name}</span>
+                                            <span className="text-[10px] font-bold text-muted-foreground mb-1">{intr.name}</span>
                                             <div className="flex gap-1">
                                                 {/* Mask Status Dot */}
                                                 {intr.maskBit !== -1 && (
