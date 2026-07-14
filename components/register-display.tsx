@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Cpu } from "lucide-react"
+import { useSettings } from "@/components/settings-provider"
 
 interface RegisterDisplayProps {
   registers: Record<string, string>
@@ -9,6 +10,7 @@ interface RegisterDisplayProps {
 }
 
 export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayProps) {
+  const { highlightRegisters } = useSettings()
   const [changedRegs, setChangedRegs] = useState<Set<string>>(new Set())
   const [editingPC, setEditingPC] = useState(false)
   const [pcInput, setPcInput] = useState("")
@@ -16,11 +18,13 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
 
   useEffect(() => {
     const changed = new Set<string>()
-    Object.keys(registers).forEach((key) => {
-      if (registers[key] !== prevRegs.current[key]) {
-        changed.add(key)
-      }
-    })
+    if (highlightRegisters) {
+      Object.keys(registers).forEach((key) => {
+        if (registers[key] !== prevRegs.current[key]) {
+          changed.add(key)
+        }
+      })
+    }
     if (changed.size > 0) {
       setChangedRegs(changed)
       setTimeout(() => setChangedRegs(new Set()), 600)
@@ -33,7 +37,7 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
       className={`p-2 rounded-lg border transition-all duration-300 ${
         changedRegs.has(reg)
           ? "bg-blue-500/20 border-blue-500/50 shadow-[0_0_12px_rgba(74,144,226,0.3)]"
-          : "bg-white/[0.02] border-white/5"
+          : "bg-muted/50 border-border"
       }`}
     >
       <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{label}</div>
@@ -50,7 +54,7 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
   const PairBox = ({ title, highReg, lowReg }: { title: string, highReg: string, lowReg: string }) => {
     const pairValue = `${registers[highReg]}${registers[lowReg]}`
     return (
-      <div className="flex flex-col gap-1 border border-white/5 bg-white/[0.01] rounded-lg p-2">
+      <div className="flex flex-col gap-1 border border-border bg-muted/30 rounded-lg p-2">
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-gray-500 uppercase tracking-wider">{title}</span>
           <span className="text-[10px] text-gray-600 font-mono">{pairValue}H</span>
@@ -64,16 +68,16 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
   }
 
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Cpu className="w-4 h-4 text-blue-400" />
         <span className="text-sm font-medium text-gray-300">CPU Registers</span>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Accumulator */}
-        <div className="border border-white/5 bg-white/[0.01] rounded-lg p-2">
+        <div className="border border-border bg-muted/30 rounded-lg p-2">
           <span className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block">Accumulator (A)</span>
           <RegisterBox reg="A" label="A" />
         </div>
@@ -92,7 +96,7 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
             <div className={`p-3 rounded-lg border transition-all duration-300 flex-1 flex flex-col justify-center ${
                 changedRegs.has("PC")
                   ? "bg-cyan-500/20 border-cyan-500/50 shadow-[0_0_12px_rgba(0,245,255,0.3)]"
-                  : "bg-white/[0.02] border-white/5"
+                  : "bg-muted/50 border-border"
               }`}
             >
               <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
@@ -139,7 +143,7 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
             <div className={`p-2 rounded-lg border transition-all duration-300 ${
                 changedRegs.has("SP")
                   ? "bg-cyan-500/20 border-cyan-500/50 shadow-[0_0_12px_rgba(0,245,255,0.3)]"
-                  : "bg-white/[0.02] border-white/5"
+                  : "bg-muted/50 border-border"
               }`}
             >
               <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
@@ -159,3 +163,4 @@ export default function RegisterDisplay({ registers, onSetPC }: RegisterDisplayP
     </div>
   )
 }
+

@@ -24,8 +24,18 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   const bgRef = useRef<HTMLDivElement>(null)
   const highlightRef = useRef<HTMLDivElement>(null)
   const { data: session } = useSession()
-  const { fontSize, companionMode, setCompanionMode } = useSettings()
+  const { fontSize, companionMode, setCompanionMode, autoUppercase, syntaxHighlighting, autoSave } = useSettings()
   const [suggestion, setSuggestion] = useState<string | null>(null)
+
+  // Auto Save
+  useEffect(() => {
+    if (autoSave && code) {
+      const handler = setTimeout(() => {
+        localStorage.setItem("mp8085-autosave-code", code)
+      }, 1000)
+      return () => clearTimeout(handler)
+    }
+  }, [code, autoSave])
 
   // Identify guest user
   // @ts-ignore
@@ -84,6 +94,10 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
     } else {
       const parts = line.split(/(\s+|;.*)/)
       content = parts.map((part, i) => {
+        if (!syntaxHighlighting) {
+          if (part.trim().startsWith(";")) return <span key={i} className="text-gray-500">{part}</span>
+          return <span key={i} className="text-gray-200">{part}</span>
+        }
         if (part.trim().startsWith(";")) return <span key={i} className="text-gray-500">{part}</span>
         if (OPCODES.includes(part.toUpperCase())) return <span key={i} className="text-blue-400 font-bold">{part}</span>
         if (part.match(/^[0-9A-Fa-f]+H?$/)) return <span key={i} className="text-orange-400">{part}</span>
@@ -147,15 +161,33 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newCode = e.target.value
+    let newCode = e.target.value
+    const cursorPosition = e.target.selectionStart
+
+    if (autoUppercase) {
+      newCode = newCode.split('\n').map(line => {
+        const commentIdx = line.indexOf(';')
+        if (commentIdx === -1) return line.toUpperCase()
+        return line.slice(0, commentIdx).toUpperCase() + line.slice(commentIdx)
+      }).join('\n')
+    }
+
     setCode(newCode)
+
+    if (autoUppercase && textareaRef.current) {
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = cursorPosition
+          textareaRef.current.selectionEnd = cursorPosition
+        }
+      }, 0)
+    }
 
     if (!enableCompanion) {
       setSuggestion(null)
       return
     }
 
-    const cursorPosition = e.target.selectionStart
     const textBeforeCursor = newCode.slice(0, cursorPosition)
     const linesArr = textBeforeCursor.split("\n")
     const currentLine = linesArr[linesArr.length - 1]
@@ -172,7 +204,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (suggestion && (e.key === "Tab" || e.key === "ArrowRight")) {
+    if (suggestion && e.key === "Tab") {
       e.preventDefault()
       const cursorPosition = textareaRef.current?.selectionStart || 0
       
@@ -211,9 +243,9 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
   }
 
   return (
-    <div className="h-full w-full rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden flex flex-col">
+    <div className="h-full w-full rounded-lg bg-background border border-border overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <FileCode className="w-4 h-4 text-blue-400" />
           <span className="text-sm font-medium text-gray-300">program.asm</span>
@@ -238,7 +270,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
         <div 
           ref={linesRef} 
           onWheel={handleWheel}
-          className="py-3 px-1 bg-white/[0.01] border-r border-white/5 select-none overflow-hidden flex flex-col items-end shrink-0 cursor-default"
+          className="py-3 px-1 bg-muted/30 border-r border-border select-none overflow-hidden flex flex-col items-end shrink-0 cursor-default"
         >
           {lines.map((_, i) => (
             <div
@@ -287,7 +319,7 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
             onKeyDown={handleKeyDown}
             onScroll={handleScroll}
             style={{ fontSize: `${fontSize}px`, lineHeight: '1.5em' }}
-            className="absolute inset-0 w-full h-full p-3 font-mono bg-transparent text-transparent caret-white resize-none focus:outline-none overflow-y-auto"
+            className="absolute inset-0 w-full h-full p-3 font-mono bg-transparent text-transparent caret-white resize-none focus:outline-none overflow-auto whitespace-pre custom-scrollbar"
             spellCheck={false}
             placeholder="; Write your 8085 assembly code here..."
           />
@@ -298,3 +330,4 @@ export default function CodeEditor({ code, setCode, activeLine }: CodeEditorProp
     </div>
   )
 }
+

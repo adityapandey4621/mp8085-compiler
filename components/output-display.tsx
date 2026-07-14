@@ -33,16 +33,16 @@ export default function OutputDisplay({ ledValue, segmentValue }: OutputDisplayP
   const getSegments = (char: string) => segments[char.toUpperCase()] || segments["0"]
 
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Monitor className="w-4 h-4 text-purple-400" />
         <span className="text-sm font-medium text-gray-300">Output Display</span>
       </div>
 
       <div className="p-4 space-y-4">
         {/* 7-Segment Display */}
-        <div className="flex items-center justify-center gap-2 p-4 rounded-lg bg-[#0f0f14] border border-white/5">
+        <div className="flex items-center justify-center gap-2 p-4 rounded-lg bg-[#0f0f14] border border-border">
           {segmentValue.split("").map((char, idx) => {
             const segs = getSegments(char)
             return (
@@ -73,7 +73,7 @@ export default function OutputDisplay({ ledValue, segmentValue }: OutputDisplayP
         </div>
 
         {/* LED Bar */}
-        <div className="flex items-center justify-between gap-1.5 p-3 rounded-lg bg-[#0f0f14] border border-white/5">
+        <div className="flex items-center justify-between gap-1.5 p-3 rounded-lg bg-[#0f0f14] border border-border">
           {bits.map((bit, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <div
@@ -89,3 +89,4 @@ export default function OutputDisplay({ ledValue, segmentValue }: OutputDisplayP
     </div>
   )
 }
+

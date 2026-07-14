@@ -17,9 +17,9 @@ export default function OutputConsole({ logs }: OutputConsoleProps) {
   }, [logs])
 
   return (
-    <div className="bg-[#0a0a0f]/90 border border-[#1a1a2e] rounded-2xl overflow-hidden backdrop-blur-xl animate-slide-up">
+    <div className="bg-background/90 border border-border rounded-2xl overflow-hidden backdrop-blur-xl animate-slide-up">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-[#1a1a2e] bg-[#0d0d12]">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-[#0d0d12]">
         <Terminal className="w-4 h-4 text-[#2AFFAE]" />
         <span className="text-sm text-gray-400">Output Console</span>
       </div>
@@ -55,3 +55,4 @@ export default function OutputConsole({ logs }: OutputConsoleProps) {
     </div>
   )
 }
+

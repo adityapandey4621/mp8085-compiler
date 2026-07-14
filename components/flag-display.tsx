@@ -38,9 +38,9 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
   }, [flags])
 
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Flag className="w-4 h-4 text-emerald-400" />
         <span className="text-sm font-medium text-gray-300">Flag Register</span>
       </div>
@@ -61,7 +61,7 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
                             : "bg-gray-500/20 border-gray-500/30"
                           : value
                             ? "bg-emerald-500/20 border-emerald-500/30"
-                            : "bg-white/[0.02] border-white/5"
+                            : "bg-muted/50 border-border"
                       }`}
                     >
                       <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{flag}</div>
@@ -74,7 +74,7 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
                       </div>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom" className="bg-[#0a0a0f] border-white/10 text-xs max-w-[200px]">
+                  <TooltipContent side="bottom" className="bg-background border-border/60 text-xs max-w-[200px]">
                     {flagDescriptions[flag]}
                   </TooltipContent>
                 </Tooltip>
@@ -86,3 +86,4 @@ export default function FlagDisplay({ flags }: FlagDisplayProps) {
     </div>
   )
 }
+

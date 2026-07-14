@@ -29,7 +29,7 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#0a0a0f]/95 backdrop-blur-xl border-white/10 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-border/60 p-0 overflow-hidden">
         {/* Glassmorphism effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
 
@@ -57,7 +57,7 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
           <div className="space-y-3 mb-6">
             <Button
               variant="outline"
-              className="w-full h-11 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 gap-3"
+              className="w-full h-11 bg-white/5 border-border/60 hover:bg-white/10 hover:border-white/20 gap-3"
               onClick={() => handleOAuth("google")}
               disabled={loading}
             >
@@ -83,14 +83,14 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
             </Button>
 
             <div className="relative flex items-center py-2">
-              <div className="grow border-t border-white/10"></div>
+              <div className="grow border-t border-border/60"></div>
               <span className="shrink-0 px-2 text-xs text-gray-500 font-medium">OR</span>
-              <div className="grow border-t border-white/10"></div>
+              <div className="grow border-t border-border/60"></div>
             </div>
 
             <Button
               variant="outline"
-              className="w-full h-11 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 gap-3"
+              className="w-full h-11 bg-white/5 border-border/60 hover:bg-white/10 hover:border-white/20 gap-3"
               onClick={() => handleOAuth("credentials")}
               disabled={loading}
             >
@@ -105,3 +105,4 @@ export default function AuthModal({ open, onOpenChange, mode, setMode }: AuthMod
     </Dialog>
   )
 }
+

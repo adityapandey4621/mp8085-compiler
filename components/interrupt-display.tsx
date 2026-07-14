@@ -27,9 +27,9 @@ export default function InterruptDisplay({
     ]
 
     return (
-        <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+        <div className="rounded-lg bg-background border border-border overflow-hidden">
             {/* Header */}
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
                 <Zap className="w-4 h-4 text-yellow-400" />
                 <span className="text-sm font-medium text-gray-300">Interrupts & Serial I/O</span>
             </div>
@@ -67,7 +67,7 @@ export default function InterruptDisplay({
                       flex flex-col items-center justify-center p-2 rounded border transition-all duration-300
                       ${isPending
                                                 ? "bg-yellow-500/20 border-yellow-500/40 shadow-[0_0_10px_rgba(234,179,8,0.2)]"
-                                                : "bg-white/[0.02] border-white/5"}
+                                                : "bg-muted/50 border-border"}
                     `}>
                                             <span className="text-[10px] font-bold text-gray-400 mb-1">{intr.name}</span>
                                             <div className="flex gap-1">
@@ -84,7 +84,7 @@ export default function InterruptDisplay({
                                             </div>
                                         </div>
                                     </TooltipTrigger>
-                                    <TooltipContent side="bottom" className="bg-[#0a0a0f] border-white/10 text-xs">
+                                    <TooltipContent side="bottom" className="bg-background border-border/60 text-xs">
                                         <p>{intr.name}</p>
                                         <p>Status: {isPending ? "Pending" : "Inactive"}</p>
                                         {intr.maskBit !== -1 && <p>Mask: {isMasked ? "Masked" : "Unmasked"}</p>}
@@ -98,3 +98,4 @@ export default function InterruptDisplay({
         </div>
     )
 }
+

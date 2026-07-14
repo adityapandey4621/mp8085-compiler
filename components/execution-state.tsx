@@ -14,9 +14,9 @@ export default function ExecutionState({ memory, instructionsExecuted, pc }: Exe
   const { hex, meta } = decodeInstruction(memory, pcVal)
 
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <PlayCircle className="w-4 h-4 text-fuchsia-400" />
           <span className="text-sm font-medium text-gray-300">Execution State</span>
@@ -56,7 +56,7 @@ export default function ExecutionState({ memory, instructionsExecuted, pc }: Exe
           </div>
         </div>
 
-        <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+        <div className="pt-3 border-t border-border flex items-center justify-between">
           <span className="text-[10px] text-gray-500 uppercase tracking-wider">Instructions Executed</span>
           <span className="font-mono text-sm text-white font-semibold">{instructionsExecuted}</span>
         </div>
@@ -64,3 +64,4 @@ export default function ExecutionState({ memory, instructionsExecuted, pc }: Exe
     </div>
   )
 }
+

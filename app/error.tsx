@@ -15,7 +15,7 @@ export default function Error({
     }, [error])
 
     return (
-        <div className="flex h-screen w-full flex-col items-center justify-center bg-[#0a0a0f] text-white gap-4">
+        <div className="flex h-screen w-full flex-col items-center justify-center bg-background text-white gap-4">
             <h2 className="text-2xl font-bold">Something went wrong!</h2>
             <p className="text-gray-400 max-w-md text-center">
                 {error.message || "An unexpected error occurred. Please try again."}
@@ -29,3 +29,4 @@ export default function Error({
         </div>
     )
 }
+

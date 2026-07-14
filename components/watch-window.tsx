@@ -54,9 +54,9 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
   }
 
   return (
-    <div className="shrink-0 rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="shrink-0 rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <Eye className="w-4 h-4 text-purple-400" />
           <span className="text-sm font-medium text-gray-300">Watch Window</span>
@@ -71,7 +71,7 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
         {expressions.map((expr, idx) => (
           <div 
             key={idx}
-            className="flex items-center justify-between px-3 py-1.5 rounded text-xs font-mono border bg-white/[0.02] border-white/5 text-gray-400 group"
+            className="flex items-center justify-between px-3 py-1.5 rounded text-xs font-mono border bg-muted/50 border-border text-gray-400 group"
           >
             <span className="text-white/80">{expr}</span>
             <div className="flex items-center gap-2">
@@ -85,7 +85,7 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
         ))}
         
         {isAdding && (
-          <div className="flex items-center px-2 py-1 bg-white/[0.05] rounded border border-white/10">
+          <div className="flex items-center px-2 py-1 bg-white/[0.05] rounded border border-border/60">
             <input
               autoFocus
               type="text"
@@ -111,3 +111,4 @@ export default function WatchWindow({ registers, memory }: WatchWindowProps) {
     </div>
   )
 }
+

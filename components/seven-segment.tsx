@@ -62,9 +62,9 @@ export default function SevenSegment({ value }: SevenSegmentProps) {
   const chars = value.padStart(2, "0").slice(-2).split("")
 
   return (
-    <div className="bg-[#0a0a0f]/90 border border-[#1a1a2e] rounded-2xl overflow-hidden backdrop-blur-xl animate-scale-in">
+    <div className="bg-background/90 border border-border rounded-2xl overflow-hidden backdrop-blur-xl animate-scale-in">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-[#1a1a2e] bg-[#0d0d12]">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-[#0d0d12]">
         <Monitor className="w-4 h-4 text-[#FF3B3B]" />
         <span className="text-xs text-gray-400">7-Segment Display</span>
       </div>
@@ -80,3 +80,4 @@ export default function SevenSegment({ value }: SevenSegmentProps) {
     </div>
   )
 }
+

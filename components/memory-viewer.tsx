@@ -23,14 +23,14 @@ export default function MemoryViewer({ memory, currentPC }: MemoryViewerProps) {
   const currentRow = Math.floor((currentPC - 0x2000) / 16)
 
   return (
-    <div className="bg-[#0a0a0f]/90 border border-[#1a1a2e] rounded-2xl overflow-hidden backdrop-blur-xl flex-1 flex flex-col animate-slide-left">
+    <div className="bg-background/90 border border-border rounded-2xl overflow-hidden backdrop-blur-xl flex-1 flex flex-col animate-slide-left">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a2e] bg-[#0d0d12]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-[#0d0d12]">
         <div className="flex items-center gap-2">
           <Database className="w-4 h-4 text-[#4A90E2]" />
           <span className="text-sm font-medium text-white">Memory Viewer</span>
         </div>
-        <div className="flex items-center gap-2 bg-[#0a0a0f] border border-[#1a1a2e] rounded-lg px-2 py-1">
+        <div className="flex items-center gap-2 bg-background border border-border rounded-lg px-2 py-1">
           <Search className="w-3 h-3 text-gray-500" />
           <input
             type="text"
@@ -41,7 +41,7 @@ export default function MemoryViewer({ memory, currentPC }: MemoryViewerProps) {
       </div>
 
       {/* Header Row */}
-      <div className="flex px-4 py-2 border-b border-[#1a1a2e] bg-[#0d0d12]/50 text-[10px] text-gray-500 font-mono">
+      <div className="flex px-4 py-2 border-b border-border bg-[#0d0d12]/50 text-[10px] text-gray-500 font-mono">
         <span className="w-16">ADDR</span>
         {Array.from({ length: 16 }, (_, i) => (
           <span key={i} className="w-6 text-center">
@@ -58,7 +58,7 @@ export default function MemoryViewer({ memory, currentPC }: MemoryViewerProps) {
             <div
               key={row.address}
               className={`flex px-4 py-1 font-mono text-xs border-b border-[#0a0a0f] transition-colors duration-200 ${
-                isCurrentRow ? "bg-[#00F5FF]/10" : rowIdx % 2 === 0 ? "bg-[#0a0a0f]/30" : ""
+                isCurrentRow ? "bg-[#00F5FF]/10" : rowIdx % 2 === 0 ? "bg-background/30" : ""
               }`}
             >
               <span className="w-16 text-[#4A90E2]">
@@ -88,3 +88,4 @@ export default function MemoryViewer({ memory, currentPC }: MemoryViewerProps) {
     </div>
   )
 }
+

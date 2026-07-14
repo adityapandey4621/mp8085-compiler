@@ -4,7 +4,7 @@ import { Cpu, Github, Settings, HelpCircle } from "lucide-react"
 
 export default function NavigationBar() {
   return (
-    <nav className="border-b border-[#1a1a2e] bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50 animate-slide-down">
+    <nav className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-50 animate-slide-down">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
@@ -50,3 +50,4 @@ export default function NavigationBar() {
     </nav>
   )
 }
+

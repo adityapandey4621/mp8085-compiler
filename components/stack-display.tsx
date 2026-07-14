@@ -26,17 +26,23 @@ export default function StackDisplay({ memory, sp }: StackDisplayProps) {
     })
   }
 
-  // Smooth scroll to SP row
+  const lastScrollTime = useRef<number>(0)
+
+  // Smooth scroll to SP row with throttling to allow the glide to complete
   useEffect(() => {
     if (activeRowRef.current) {
-      activeRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+      const now = Date.now()
+      if (now - lastScrollTime.current > 150) {
+        activeRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+        lastScrollTime.current = now
+      }
     }
   }, [spVal])
 
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden flex flex-col h-[180px]">
+    <div className="rounded-lg bg-background border border-border overflow-hidden flex flex-col h-[180px]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <Database className="w-4 h-4 text-emerald-400" />
           <span className="text-sm font-medium text-gray-300">Stack</span>
@@ -52,7 +58,7 @@ export default function StackDisplay({ memory, sp }: StackDisplayProps) {
             className={`flex items-center justify-between px-3 py-1.5 rounded text-xs font-mono border transition-all duration-300 ${
               item.isSP 
                 ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)] z-10 relative scale-[1.02]" 
-                : "bg-white/[0.02] border-white/5 text-gray-400"
+                : "bg-muted/50 border-border text-gray-400"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -70,3 +76,4 @@ export default function StackDisplay({ memory, sp }: StackDisplayProps) {
     </div>
   )
 }
+

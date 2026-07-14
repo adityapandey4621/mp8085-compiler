@@ -67,7 +67,7 @@ export default function SignUp() {
     }
 
     return (
-        <div className="min-h-screen w-full bg-[#050505] text-white flex items-center justify-center relative overflow-hidden">
+        <div className="min-h-screen w-full bg-background text-white flex items-center justify-center relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
@@ -76,7 +76,7 @@ export default function SignUp() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative z-10"
+                className="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-border/60 backdrop-blur-xl shadow-2xl relative z-10"
             >
                 <div className="flex flex-col items-center text-center mb-8">
                     <motion.div 
@@ -104,7 +104,7 @@ export default function SignUp() {
                             placeholder="John Doe" 
                             value={formData.name}
                             onChange={handleChange}
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
+                            className="bg-black/50 border-border/60 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
                             required
                         />
                     </div>
@@ -116,7 +116,7 @@ export default function SignUp() {
                             placeholder="johndoe8085" 
                             value={formData.username}
                             onChange={handleChange}
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
+                            className="bg-black/50 border-border/60 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
                             required
                         />
                     </div>
@@ -129,7 +129,7 @@ export default function SignUp() {
                             placeholder="john@example.com" 
                             value={formData.email}
                             onChange={handleChange}
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
+                            className="bg-black/50 border-border/60 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
                             required
                         />
                     </div>
@@ -142,7 +142,7 @@ export default function SignUp() {
                             placeholder="••••••••" 
                             value={formData.password}
                             onChange={handleChange}
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
+                            className="bg-black/50 border-border/60 text-white placeholder:text-gray-500 focus-visible:ring-blue-500"
                             required
                             minLength={6}
                         />
@@ -173,3 +173,4 @@ export default function SignUp() {
         </div>
     )
 }
+

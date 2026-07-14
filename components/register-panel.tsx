@@ -20,9 +20,9 @@ const registerConfig = [
 
 export default function RegisterPanel({ registers }: RegisterPanelProps) {
   return (
-    <div className="bg-[#0a0a0f]/90 border border-[#1a1a2e] rounded-2xl overflow-hidden backdrop-blur-xl animate-slide-up">
+    <div className="bg-background/90 border border-border rounded-2xl overflow-hidden backdrop-blur-xl animate-slide-up">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1a1a2e] bg-[#0d0d12]">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-[#0d0d12]">
         <div className="relative">
           <div className="absolute inset-0 bg-[#00F5FF] blur-md opacity-40" />
           <Cpu className="w-5 h-5 text-[#00F5FF] relative" />
@@ -35,7 +35,7 @@ export default function RegisterPanel({ registers }: RegisterPanelProps) {
         {registerConfig.map((reg) => (
           <div
             key={reg.name}
-            className={`bg-[#0d0d15] border border-[#1a1a2e] rounded-xl p-3 relative overflow-hidden transition-transform duration-200 hover:scale-[1.02] ${
+            className={`bg-[#0d0d15] border border-border rounded-xl p-3 relative overflow-hidden transition-transform duration-200 hover:scale-[1.02] ${
               reg.span === 2 ? "col-span-2" : ""
             }`}
             style={{
@@ -64,3 +64,4 @@ export default function RegisterPanel({ registers }: RegisterPanelProps) {
     </div>
   )
 }
+

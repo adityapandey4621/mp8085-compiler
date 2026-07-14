@@ -48,7 +48,7 @@ export default function SignIn() {
     }
 
     return (
-        <div className="min-h-screen w-full bg-[#050505] text-white flex items-center justify-center relative overflow-hidden">
+        <div className="min-h-screen w-full bg-background text-white flex items-center justify-center relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
@@ -57,7 +57,7 @@ export default function SignIn() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative z-10"
+                className="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-border/60 backdrop-blur-xl shadow-2xl relative z-10"
             >
                 <div className="flex flex-col items-center text-center mb-8">
                     <motion.div 
@@ -85,7 +85,7 @@ export default function SignIn() {
                             placeholder="johndoe or john@example.com" 
                             value={formData.usernameOrEmail}
                             onChange={handleChange}
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 focus-visible:ring-blue-500 transition-all"
+                            className="bg-black/50 border-border/60 text-white placeholder:text-gray-500 focus-visible:ring-blue-500 transition-all"
                             required
                         />
                     </div>
@@ -98,7 +98,7 @@ export default function SignIn() {
                             placeholder="••••••••" 
                             value={formData.password}
                             onChange={handleChange}
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 focus-visible:ring-blue-500 transition-all"
+                            className="bg-black/50 border-border/60 text-white placeholder:text-gray-500 focus-visible:ring-blue-500 transition-all"
                             required
                         />
                     </div>
@@ -135,10 +135,10 @@ export default function SignIn() {
 
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-white/10"></div>
+                        <div className="w-full border-t border-border/60"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-4 bg-[#0a0a0f] text-gray-500 rounded-full font-medium tracking-wider text-xs uppercase">Or</span>
+                        <span className="px-4 bg-background text-gray-500 rounded-full font-medium tracking-wider text-xs uppercase">Or</span>
                     </div>
                 </div>
 
@@ -174,3 +174,4 @@ export default function SignIn() {
         </div>
     )
 }
+

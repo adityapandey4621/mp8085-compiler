@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { useSession, signIn, signOut } from "next-auth/react"
-import { SettingsDialog } from "@/components/settings-dialog"
+import SettingsDialog from "@/components/settings-dialog"
 
 export default function SimulatorNav() {
   const { data: session } = useSession()
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
-    <nav className="border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-sm sticky top-0 z-50">
+    <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
@@ -33,15 +33,10 @@ export default function SimulatorNav() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
-          <Link href="/documentation">
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white h-8 w-8">
-              <HelpCircle className="w-4 h-4" />
-            </Button>
-          </Link>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-gray-400 hover:text-white h-8 w-8"
+            size="sm"
+            className="hidden sm:flex text-gray-400 hover:text-white"
             onClick={() => setSettingsOpen(true)}
           >
             <Settings className="w-4 h-4" />
@@ -58,7 +53,7 @@ export default function SimulatorNav() {
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-[#0a0a0f] border-white/10">
+              <DropdownMenuContent align="end" className="w-48 bg-background border-border/60">
                 <div className="px-2 py-1.5 text-sm truncate">
                   <div className="text-gray-200 font-medium">{session.user?.name || "User"}</div>
                   <div className="text-gray-500 text-xs">
@@ -107,3 +102,4 @@ export default function SimulatorNav() {
     </nav>
   )
 }
+

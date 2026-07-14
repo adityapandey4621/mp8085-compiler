@@ -26,9 +26,9 @@ export default function ConsolePanel({ logs }: ConsolePanelProps) {
   }
 
   return (
-    <div className="h-full w-full rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden flex flex-col">
+    <div className="h-full w-full rounded-lg bg-background border border-border overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/50">
         <Terminal className="w-4 h-4 text-emerald-400" />
         <span className="text-sm font-medium text-gray-300">Console</span>
       </div>
@@ -45,3 +45,4 @@ export default function ConsolePanel({ logs }: ConsolePanelProps) {
     </div>
   )
 }
+

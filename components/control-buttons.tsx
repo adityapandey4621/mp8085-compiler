@@ -30,7 +30,7 @@ export default function ControlButtons({ onAssemble, onRun, onStep, onReset, onC
   }
 
   return (
-    <div className="flex flex-wrap gap-2 bg-[#0a0a0f]/90 border border-[#1a1a2e] rounded-2xl p-4 backdrop-blur-xl animate-fade-in">
+    <div className="flex flex-wrap gap-2 bg-background/90 border border-border rounded-2xl p-4 backdrop-blur-xl animate-fade-in">
       {buttons.map((btn) => (
         <button
           key={btn.id}
@@ -53,3 +53,4 @@ export default function ControlButtons({ onAssemble, onRun, onStep, onReset, onC
     </div>
   )
 }
+

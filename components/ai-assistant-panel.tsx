@@ -79,13 +79,13 @@ export function AIAssistantPanel({
   const usagePercentage = (messagesUsed / maxMessagesPerSession) * 100;
 
   return (
-    <div className="w-full space-y-4">
-      <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 relative overflow-hidden">
+    <div className="w-full h-full flex flex-col text-gray-200">
+      <div className="flex-1 flex flex-col relative overflow-hidden">
         {isGuest && (
           <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center">
             <Lock className="w-12 h-12 text-purple-600 mb-4" />
-            <h3 className="text-lg font-bold text-gray-900 mb-2">AI Features Locked</h3>
-            <p className="text-gray-600 mb-6 max-w-xs">
+            <h3 className="text-lg font-bold text-white mb-2">AI Features Locked</h3>
+            <p className="text-gray-300 mb-6 max-w-xs">
               Guest users cannot access the AI Assist features. Please sign in with Google to continue learning.
             </p>
             <Button
@@ -97,40 +97,39 @@ export function AIAssistantPanel({
             </Button>
           </div>
         )}
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-purple-600" />
-              <CardTitle>AI Assembly Tutor</CardTitle>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 rounded bg-purple-100 px-2 py-1">
-                <Zap className="h-4 w-4 text-yellow-600" />
-                <span className="text-sm font-semibold text-purple-700">{tokens}</span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowTokenShop(!showTokenShop)}
-              >
-                Buy Tokens
-              </Button>
-            </div>
+        <div className="px-4 py-2 flex items-center justify-between border-b border-border bg-white/5">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="h-4 w-4 text-purple-400" />
+            <span className="font-semibold text-sm">AI Assembly Tutor</span>
           </div>
-        </CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded bg-purple-900/40 border border-purple-500/30 px-2 py-1">
+              <Zap className="h-3 w-3 text-yellow-500" />
+              <span className="text-xs font-semibold text-purple-200">{tokens}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTokenShop(!showTokenShop)}
+              className="h-7 text-xs border-border/60 hover:bg-white/10"
+            >
+              Buy Tokens
+            </Button>
+          </div>
+        </div>
 
-        <CardContent className="space-y-4">
+        <div className="flex-1 flex flex-col p-4 space-y-4 overflow-hidden">
           {/* Token Shop */}
           {showTokenShop && (
-            <Card className="border-yellow-200 bg-yellow-50">
+            <Card className="border-yellow-500/30 bg-yellow-900/20">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Purchase Tokens</CardTitle>
+                <CardTitle className="text-sm text-yellow-500">Purchase Tokens</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     variant="outline"
-                    className="border-yellow-300"
+                    className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10"
                     onClick={() => {
                       addTokens(5);
                       setShowTokenShop(false);
@@ -140,7 +139,7 @@ export function AIAssistantPanel({
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-yellow-300"
+                    className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10"
                     onClick={() => {
                       addTokens(20);
                       setShowTokenShop(false);
@@ -149,7 +148,7 @@ export function AIAssistantPanel({
                     20 Tokens - $5.99
                   </Button>
                 </div>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-yellow-500/70">
                   Each message uses 1 token. Your first message is free!
                 </p>
               </CardContent>
@@ -158,42 +157,42 @@ export function AIAssistantPanel({
 
           {/* Usage Status */}
           {remainingFreeMessages > 0 && tokens === 0 && (
-            <Alert className="border-green-200 bg-green-50">
-              <AlertCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
+            <Alert className="border-green-500/30 bg-green-900/20">
+              <AlertCircle className="h-4 w-4 text-green-400" />
+              <AlertDescription className="text-green-300">
                 Free trial: {remainingFreeMessages} message(s) remaining before tokens required
               </AlertDescription>
             </Alert>
           )}
 
           {error && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">{error}</AlertDescription>
+            <Alert className="border-red-500/30 bg-red-900/20">
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <AlertDescription className="text-red-300">{error}</AlertDescription>
             </Alert>
           )}
 
           {/* Assistant Type Selection */}
           <Tabs value={assistantType} onValueChange={(val) => setAssistantType(val as any)}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="guided">Guided Help</TabsTrigger>
-              <TabsTrigger value="review">Code Review</TabsTrigger>
-              <TabsTrigger value="debug">Debugging</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-white/5 border border-border/60">
+              <TabsTrigger value="guided" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Guided Help</TabsTrigger>
+              <TabsTrigger value="review" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Code Review</TabsTrigger>
+              <TabsTrigger value="debug" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Debugging</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="guided" className="text-sm text-gray-600">
+            <TabsContent value="guided" className="text-xs text-gray-400 mt-2 text-center">
               Step-by-step guidance on learning 8085 assembly programming
             </TabsContent>
-            <TabsContent value="review" className="text-sm text-gray-600">
+            <TabsContent value="review" className="text-xs text-gray-400 mt-2 text-center">
               Get feedback on your assembly code quality and correctness
             </TabsContent>
-            <TabsContent value="debug" className="text-sm text-gray-600">
+            <TabsContent value="debug" className="text-xs text-gray-400 mt-2 text-center">
               Debug your programs with step-by-step analysis
             </TabsContent>
           </Tabs>
 
           {/* Conversation Display */}
-          <div className="max-h-[400px] space-y-3 overflow-y-auto rounded-lg bg-white p-3">
+          <div className="flex-1 space-y-3 overflow-y-auto rounded-lg bg-black/40 border border-border p-3 custom-scrollbar">
             {conversation.length === 0 && (
               <div className="flex h-[200px] flex-col items-center justify-center gap-2 text-gray-400">
                 <MessageCircle className="h-8 w-8 opacity-30" />
@@ -208,8 +207,8 @@ export function AIAssistantPanel({
               >
                 <div
                   className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${msg.role === 'user'
-                    ? 'bg-purple-100 text-purple-900'
-                    : 'bg-gray-100 text-gray-900'
+                    ? 'bg-purple-600/30 border border-purple-500/30 text-purple-100'
+                    : 'bg-white/5 border border-border/60 text-gray-200'
                     }`}
                 >
                   {msg.content.includes('```assembly') ? (
@@ -223,8 +222,8 @@ export function AIAssistantPanel({
                         
                         return (
                           <div key={i} className="my-2">
-                            <div className="border border-purple-200 rounded-md bg-[#0a0a0f] text-gray-200 overflow-hidden text-left relative">
-                              <div className="bg-white/[0.05] border-b border-white/10 px-3 py-1.5 text-[10px] text-gray-400 flex justify-between items-center uppercase tracking-wider font-semibold">
+                            <div className="border border-purple-200 rounded-md bg-background text-gray-200 overflow-hidden text-left relative">
+                              <div className="bg-white/[0.05] border-b border-border/60 px-3 py-1.5 text-[10px] text-gray-400 flex justify-between items-center uppercase tracking-wider font-semibold">
                                 <span>Assembly</span>
                                 {onApplyCode && (
                                   <Button 
@@ -256,13 +255,13 @@ export function AIAssistantPanel({
 
             {loading && (
               <div className="flex gap-2">
-                <div className="rounded-lg bg-gray-100 px-3 py-2 flex items-center gap-2">
+                <div className="rounded-lg bg-white/5 border border-border/60 px-3 py-2 flex items-center gap-2">
                   <div className="flex gap-1">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-500" />
-                    <div className="animation-delay-100 h-2 w-2 animate-bounce rounded-full bg-gray-500" />
-                    <div className="animation-delay-200 h-2 w-2 animate-bounce rounded-full bg-gray-500" />
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-purple-400" />
+                    <div className="animation-delay-100 h-2 w-2 animate-bounce rounded-full bg-purple-400" />
+                    <div className="animation-delay-200 h-2 w-2 animate-bounce rounded-full bg-purple-400" />
                   </div>
-                  {statusMessage && <span className="text-xs text-gray-500 italic ml-2">{statusMessage}</span>}
+                  {statusMessage && <span className="text-xs text-gray-400 italic ml-2">{statusMessage}</span>}
                 </div>
               </div>
             )}
@@ -271,14 +270,14 @@ export function AIAssistantPanel({
           </div>
 
           {/* Input Area */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-2 border-t border-border">
             <Input
               placeholder="Ask about 8085 assembly..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               disabled={!canUseAssistant() || loading}
-              className="text-sm"
+              className="text-sm bg-black/40 border-border/60 text-white placeholder:text-gray-500"
             />
             <Button
               onClick={handleSendMessage}
@@ -296,25 +295,25 @@ export function AIAssistantPanel({
               variant="outline"
               size="sm"
               onClick={resetSession}
-              className="w-full"
+              className="w-full bg-white/5 border-border/60 hover:bg-white/10 text-gray-300"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               Start New Conversation
             </Button>
           )}
 
-          {/* Info Text */}
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 text-center">
             {tokens > 0
               ? `${tokens} tokens available`
               : remainingFreeMessages > 0
                 ? `${remainingFreeMessages} free message(s) left before tokens required`
                 : 'Purchase tokens to continue using the AI assistant'}
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default AIAssistantPanel;
+

@@ -8,9 +8,9 @@ interface IOPortsProps {
 
 export default function IOPorts({ ports }: IOPortsProps) {
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <Radio className="w-4 h-4 text-cyan-400" />
         <span className="text-sm font-medium text-gray-300">I/O Ports</span>
       </div>
@@ -19,7 +19,7 @@ export default function IOPorts({ ports }: IOPortsProps) {
         {Object.entries(ports).map(([port, value]) => (
           <div
             key={port}
-            className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5"
+            className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border"
           >
             <div>
               <div className="text-[10px] text-gray-500 uppercase tracking-wider">Port</div>
@@ -35,3 +35,4 @@ export default function IOPorts({ ports }: IOPortsProps) {
     </div>
   )
 }
+

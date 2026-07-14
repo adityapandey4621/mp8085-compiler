@@ -47,10 +47,16 @@ export default function MemoryGrid({ memory, currentPC, lastMemoryAccess }: Memo
     })
   }
 
-  // Smooth scroll to active row
+  const lastScrollTime = useRef<number>(0)
+
+  // Smooth scroll to active row with throttling to allow the glide to complete
   useEffect(() => {
     if (activeRowRef.current) {
-      activeRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+      const now = Date.now()
+      if (now - lastScrollTime.current > 150) {
+        activeRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+        lastScrollTime.current = now
+      }
     }
   }, [currentPC, lastMemoryAccess])
 
@@ -69,9 +75,9 @@ export default function MemoryGrid({ memory, currentPC, lastMemoryAccess }: Memo
   }
 
   return (
-    <div className="flex-1 rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden flex flex-col min-h-[300px]">
+    <div className="flex-1 rounded-lg bg-background border border-border overflow-hidden flex flex-col min-h-[300px]">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50">
         <HardDrive className="w-4 h-4 text-amber-400" />
         <span className="text-sm font-medium text-gray-300">Memory Map</span>
         <div className="ml-auto flex items-center gap-2">
@@ -80,7 +86,7 @@ export default function MemoryGrid({ memory, currentPC, lastMemoryAccess }: Memo
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value.toUpperCase().replace(/[^0-9A-F]/g, '').slice(0, 4))}
             onKeyDown={(e) => e.key === 'Enter' && handleJump()}
-            className="w-16 bg-white/[0.03] border border-white/10 rounded px-2 py-0.5 text-amber-400 font-mono text-xs focus:outline-none focus:border-amber-500/50"
+            className="w-16 bg-white/[0.03] border border-border/60 rounded px-2 py-0.5 text-amber-400 font-mono text-xs focus:outline-none focus:border-amber-500/50"
             placeholder="ADDR"
           />
           <button
@@ -96,13 +102,13 @@ export default function MemoryGrid({ memory, currentPC, lastMemoryAccess }: Memo
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              <th className="text-[10px] text-gray-500 font-mono font-normal p-1 text-left sticky top-0 bg-[#0a0a0f] z-10 shadow-[0_1px_0_rgba(255,255,255,0.05)]">
+              <th className="text-[10px] text-gray-500 font-mono font-normal p-1 text-left sticky top-0 bg-background z-10 shadow-[0_1px_0_rgba(255,255,255,0.05)]">
                 Addr
               </th>
               {Array.from({ length: colCount }, (_, i) => (
                 <th
                   key={i}
-                  className="text-[10px] text-gray-500 font-mono font-normal p-1 text-center sticky top-0 bg-[#0a0a0f] z-10 shadow-[0_1px_0_rgba(255,255,255,0.05)]"
+                  className="text-[10px] text-gray-500 font-mono font-normal p-1 text-center sticky top-0 bg-background z-10 shadow-[0_1px_0_rgba(255,255,255,0.05)]"
                 >
                   {i.toString(16).toUpperCase()}
                 </th>
@@ -137,3 +143,4 @@ export default function MemoryGrid({ memory, currentPC, lastMemoryAccess }: Memo
     </div>
   )
 }
+

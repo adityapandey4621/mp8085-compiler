@@ -230,6 +230,12 @@ export class Assembler8085 {
     } else if (str.startsWith("'") && str.endsWith("'") && str.length === 3) {
       // Character
       return str.charCodeAt(1);
+    } else if (str.startsWith('0X')) {
+      // Hexadecimal with 0x prefix
+      const hexStr = str.substring(2);
+      if (/^[0-9A-F]+$/.test(hexStr)) {
+        return parseInt(hexStr, 16);
+      }
     } else if (/^[0-9A-F]+H$/.test(str)) {
       // Hexadecimal without explicit H (assume hex if all chars are hex digits)
       const hexStr = str.substring(0, str.length - 1);
@@ -348,6 +354,11 @@ export class Assembler8085 {
     this.parsedInstructions = [];
     this.errors = [];
     this.currentAddress = 0;
+
+    // Remove C-style block comments while preserving newlines to maintain line numbers
+    code = code.replace(/\/\*[\s\S]*?\*\//g, (match) => '\n'.repeat(match.split('\n').length - 1));
+    // Remove C-style inline comments
+    code = code.replace(/\/\/.*/g, '');
 
     const lines = code.split('\n');
 

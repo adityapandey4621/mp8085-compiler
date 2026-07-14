@@ -21,9 +21,9 @@ export default function EditorPanel({ code, setCode }: EditorPanelProps) {
   const lines = code.split("\n")
 
   return (
-    <div className="bg-[#0a0a0f]/90 border border-[#1a1a2e] rounded-2xl overflow-hidden backdrop-blur-xl flex-1 animate-slide-right">
+    <div className="bg-background/90 border border-border rounded-2xl overflow-hidden backdrop-blur-xl flex-1 animate-slide-right">
       {/* Tabs */}
-      <div className="flex border-b border-[#1a1a2e] bg-[#0d0d12]">
+      <div className="flex border-b border-border bg-[#0d0d12]">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -47,7 +47,7 @@ export default function EditorPanel({ code, setCode }: EditorPanelProps) {
       {/* Editor Body */}
       <div className="flex h-[300px] overflow-hidden">
         {/* Line Numbers */}
-        <div className="bg-[#080810] px-3 py-4 text-right select-none border-r border-[#1a1a2e]">
+        <div className="bg-[#080810] px-3 py-4 text-right select-none border-r border-border">
           {lines.map((_, i) => (
             <div key={i} className="text-xs text-gray-600 font-mono leading-6">
               {i + 1}
@@ -70,3 +70,4 @@ export default function EditorPanel({ code, setCode }: EditorPanelProps) {
     </div>
   )
 }
+

@@ -12,9 +12,9 @@ interface InstructionHistoryProps {
 
 export default function InstructionHistory({ history = [] }: InstructionHistoryProps) {
   return (
-    <div className="flex flex-col h-full rounded-lg bg-[#0a0a0f] border border-white/5 overflow-hidden">
+    <div className="flex flex-col h-full rounded-lg bg-background border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <History className="w-4 h-4 text-emerald-400" />
           <span className="text-sm font-medium text-gray-300">Instruction History</span>
@@ -33,7 +33,7 @@ export default function InstructionHistory({ history = [] }: InstructionHistoryP
             {[...history].reverse().map((inst, idx) => (
               <div 
                 key={idx} 
-                className="flex items-center justify-between px-3 py-1.5 rounded bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 font-mono text-xs"
+                className="flex items-center justify-between px-3 py-1.5 rounded bg-muted/50 hover:bg-white/[0.05] border border-border font-mono text-xs"
               >
                 <div className="flex gap-4">
                   <span className="text-cyan-500/70">{inst.address.toString(16).toUpperCase().padStart(4, "0")}H</span>
@@ -48,3 +48,4 @@ export default function InstructionHistory({ history = [] }: InstructionHistoryP
     </div>
   )
 }
+

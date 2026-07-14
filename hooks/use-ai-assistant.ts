@@ -70,6 +70,8 @@ export const useAIAssistant = () => {
           ...prev,
           tokens: parsed.tokens || 0,
           messagesUsed: parsed.messagesUsed || 0,
+          conversation: parsed.conversation || [],
+          sessionActive: parsed.conversation && parsed.conversation.length > 0,
         }));
       } catch (e) {
         console.error('Failed to load saved state:', e);
@@ -84,9 +86,10 @@ export const useAIAssistant = () => {
       JSON.stringify({
         tokens: state.tokens,
         messagesUsed: state.messagesUsed,
+        conversation: state.conversation,
       })
     );
-  }, [state.tokens, state.messagesUsed]);
+  }, [state.tokens, state.messagesUsed, state.conversation]);
 
   const canUseAssistant = (): boolean => {
     return state.tokens > 0 || state.messagesUsed < state.maxMessagesPerSession;
@@ -194,50 +197,7 @@ export const useAIAssistant = () => {
   };
 };
 
-let pipelineSingleton: any = null;
-
-async function getAIPipeline(onProgress?: (msg: string) => void) {
-    if (pipelineSingleton) return pipelineSingleton;
-    
-    if (onProgress) onProgress('Loading local AI model... (This may freeze the screen for a moment)');
-    
-    // Use a native browser ES Module import to completely bypass Turbopack and UMD variable traps
-    if (onProgress) onProgress('Downloading AI Engine...');
-    const transformersUrl = 'https://esm.sh/@xenova/transformers@2.17.2';
-    // The webpackIgnore comment forces Next.js to let the browser handle the import natively
-    const { pipeline, env } = await import(/* webpackIgnore: true */ transformersUrl);
-    
-    env.allowLocalModels = false;
-    env.backends.onnx.wasm.numThreads = 1;
-    // Point to a reliable CDN for the WASM binaries, jsdelivr usually works for WASM if not scripts
-    env.backends.onnx.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@1.17.1/dist/';
-
-    pipelineSingleton = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
-        progress_callback: (x: any) => {
-            if (x.status === 'progress' && onProgress) {
-                onProgress(`Downloading Local AI: ${Math.round(x.progress)}%`);
-            } else if (x.status === 'ready' && onProgress) {
-                onProgress('AI Ready. Thinking...');
-            }
-        }
-    });
-    
-    return pipelineSingleton;
-}
-
-async function runLocalAI(text: string, context: string, onProgress?: (msg: string) => void): Promise<string> {
-    const generator = await getAIPipeline(onProgress);
-    const prompt = `<|im_start|>system\nYou are an 8085 Assembly expert. Write clean, commented code.\nContext: ${context || 'None'}<|im_end|>\n<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`;
-    
-    const output = await generator(prompt, { 
-        max_new_tokens: 256, 
-        temperature: 0.2, 
-        do_sample: true 
-    });
-    
-    const generatedText = output[0].generated_text.replace(prompt, '').trim();
-    return generatedText;
-}
+// We are removing the unstable client-side WebLLM and delegating entirely to the Smart Backend API.
 
 // Actual API call with Fallback
 async function callAIService(
@@ -275,33 +235,34 @@ async function callAIService(
   }
 
   fullPrompt += `User: ${userMessage}\nAssistant:`;
-
+  // Real AI API Call
   try {
-    const res = await fetch('/api/ai/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: fullPrompt })
+    const response = await fetch("/api/ai/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: userMessage,
+        context,
+        assistantType,
+        conversationHistory: conversationHistory.slice(-10),
+      }),
     });
-    
-    if (res.ok) {
-      const data = await res.json();
-      if (data.generatedText) {
-        return data.generatedText;
-      }
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.response;
     }
+    
+    // If the backend fails entirely, fall back to basic rules
+    console.warn("Backend AI failed, falling back to basic rules");
   } catch (err) {
-    console.error("AI API failed, using fallback:", err);
+    console.error("API call failed:", err);
   }
 
-  try {
-    if (onProgress) onProgress('Starting Local AI Fallback...');
-    const contextString = context ? `Code: ${context.code}` : '';
-    const generated = await runLocalAI(userMessage, contextString, onProgress);
-    return generated;
-  } catch (err) {
-    console.error("WebLLM failed:", err);
-    return `**Local AI Engine Error:**\nThe advanced offline model failed to load. \n\nError details: ${err instanceof Error ? err.message : String(err)}\n\nPlease check your internet connection for the initial download or refresh the page.`;
-  }
+  // Final fallback response if network completely drops
+  return generateAssistantResponse(userMessage, assistantType, context);
 }
 
 function generateAssistantResponse(

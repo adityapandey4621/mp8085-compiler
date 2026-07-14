@@ -31,7 +31,7 @@ const colorMap = {
   purple:  { icon: "text-purple-400",  glow: "shadow-[0_0_20px_rgba(168,85,247,0.08)]", border: "border-purple-500/20" },
   rose:    { icon: "text-rose-400",    glow: "shadow-[0_0_20px_rgba(244,63,94,0.08)]",  border: "border-rose-500/20" },
   cyan:    { icon: "text-cyan-400",    glow: "shadow-[0_0_20px_rgba(6,182,212,0.08)]",  border: "border-cyan-500/20" },
-  gray:    { icon: "text-gray-400",    glow: "",                                          border: "border-white/5" },
+  gray:    { icon: "text-gray-400",    glow: "",                                          border: "border-border" },
 }
 
 export default function Panel({
@@ -53,7 +53,7 @@ export default function Panel({
   return (
     <div
       className={cn(
-        "rounded-xl bg-[#0a0a0f] border overflow-hidden transition-all duration-200",
+        "rounded-xl bg-background border overflow-hidden transition-all duration-200",
         colors.border,
         colors.glow,
         className
@@ -62,7 +62,7 @@ export default function Panel({
       {/* Header */}
       <div
         className={cn(
-          "flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]",
+          "flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/50",
           collapsible && "cursor-pointer select-none hover:bg-white/[0.04] transition-colors"
         )}
         onClick={collapsible ? () => setOpen(!open) : undefined}
@@ -71,7 +71,7 @@ export default function Panel({
         <span className="text-sm font-semibold text-gray-200 flex-1 tracking-wide">{title}</span>
 
         {badge !== undefined && (
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-white/5">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-border">
             {badge}
           </span>
         )}
@@ -106,3 +106,4 @@ export default function Panel({
     </div>
   )
 }
+

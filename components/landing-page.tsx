@@ -49,7 +49,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white overflow-hidden">
+    <div className="min-h-screen bg-background text-white overflow-hidden">
       {/* Circuit Background */}
       <div className="fixed inset-0 opacity-[0.03] pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +73,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 border-b border-white/5">
+      <nav className="relative z-10 border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
@@ -149,9 +149,9 @@ export default function LandingPage() {
 
         {/* Preview Image */}
         <div className="container mx-auto mt-20 max-w-6xl animate-slide-up" style={{ animationDelay: "0.2s" }}>
-          <div className="relative rounded-xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-1">
-            <div className="rounded-lg bg-[#0a0a0f] overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+          <div className="relative rounded-xl border border-border/60 bg-gradient-to-b from-white/5 to-transparent p-1">
+            <div className="rounded-lg bg-background overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
                 <div className="w-3 h-3 rounded-full bg-red-500/80" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
                 <div className="w-3 h-3 rounded-full bg-green-500/80" />
@@ -159,9 +159,9 @@ export default function LandingPage() {
               </div>
               <div className="aspect-[16/9] bg-gradient-to-br from-[#0a0a0f] via-[#0f0f1a] to-[#0a0a0f] flex items-center justify-center">
                 <div className="grid grid-cols-3 gap-4 p-8 w-full max-w-4xl opacity-60">
-                  <div className="bg-white/5 rounded-lg h-48 border border-white/10" />
-                  <div className="bg-white/5 rounded-lg h-48 border border-white/10" />
-                  <div className="bg-white/5 rounded-lg h-48 border border-white/10" />
+                  <div className="bg-white/5 rounded-lg h-48 border border-border/60" />
+                  <div className="bg-white/5 rounded-lg h-48 border border-border/60" />
+                  <div className="bg-white/5 rounded-lg h-48 border border-border/60" />
                 </div>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function LandingPage() {
       </section>
 
       {/* What is MP8085 */}
-      <section id="about" className="relative z-10 py-24 px-6 border-t border-white/5">
+      <section id="about" className="relative z-10 py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">What is MP8085?</h2>
           <p className="text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
@@ -200,7 +200,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="relative z-10 py-24 px-6 border-t border-white/5">
+      <section id="features" className="relative z-10 py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
@@ -212,7 +212,7 @@ export default function LandingPage() {
             {features.map((feature, index) => (
               <div
                 key={feature.title}
-                className="group p-6 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-all duration-300"
+                className="group p-6 rounded-xl bg-muted/50 border border-border hover:border-border/60 hover:bg-white/[0.04] transition-all duration-300"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-12 h-12 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -227,7 +227,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 py-24 px-6 border-t border-white/5">
+      <section className="relative z-10 py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-3xl text-center">
           <Layers className="w-12 h-12 text-blue-400 mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to start learning?</h2>
@@ -246,7 +246,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/5 py-8 px-6">
+      <footer className="relative z-10 border-t border-border py-8 px-6">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
@@ -265,3 +265,4 @@ export default function LandingPage() {
     </div>
   )
 }
+

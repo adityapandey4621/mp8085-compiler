@@ -13,7 +13,7 @@ export default function ProfilePage() {
 
     if (status === "loading") {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+            <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         )
@@ -21,7 +21,7 @@ export default function ProfilePage() {
 
     if (!session) {
         return (
-            <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+            <div className="min-h-screen bg-background text-white flex flex-col">
                 <SimulatorNav />
                 <main className="container mx-auto px-4 py-8 flex flex-col items-center justify-center flex-1">
                     <motion.div 
@@ -46,14 +46,14 @@ export default function ProfilePage() {
     const initial = (user?.name?.[0] || user?.username?.[0] || user?.email?.[0] || "U").toUpperCase()
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+        <div className="min-h-screen bg-background text-white flex flex-col">
             <SimulatorNav />
             <main className="container mx-auto px-4 py-8">
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10 p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
+                    className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10 p-8 rounded-2xl bg-white/5 border border-border/60 backdrop-blur-sm"
                 >
                     <div className="relative">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -90,7 +90,7 @@ export default function ProfilePage() {
                         transition={{ duration: 0.5, delay: 0.1 }}
                         className="md:col-span-1 space-y-6"
                     >
-                        <Card className="bg-[#0a0a0f] border-white/10 shadow-xl overflow-hidden">
+                        <Card className="bg-background border-border/60 shadow-xl overflow-hidden">
                             <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-purple-600"></div>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
@@ -123,7 +123,7 @@ export default function ProfilePage() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="md:col-span-2 space-y-6"
                     >
-                        <Card className="bg-[#0a0a0f] border-white/10 shadow-xl">
+                        <Card className="bg-background border-border/60 shadow-xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <Trophy className="w-5 h-5 text-yellow-400" />
@@ -147,7 +147,7 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-[#0a0a0f] border-white/10 shadow-xl">
+                        <Card className="bg-background border-border/60 shadow-xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <Code className="w-5 h-5 text-green-400" />
@@ -156,14 +156,14 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-3">
-                                    <div className="p-4 rounded-lg bg-white/5 border border-white/10 flex justify-between items-center transition-all hover:bg-white/10">
+                                    <div className="p-4 rounded-lg bg-white/5 border border-border/60 flex justify-between items-center transition-all hover:bg-white/10">
                                         <div className="flex flex-col">
                                             <span className="font-medium">1. Add two 8-bit numbers</span>
                                             <span className="text-xs text-gray-400 mt-1">Basic Arithmetic</span>
                                         </div>
                                         <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Completed</Badge>
                                     </div>
-                                    <div className="p-4 rounded-lg bg-white/5 border border-white/10 flex justify-between items-center transition-all hover:bg-white/10 opacity-75">
+                                    <div className="p-4 rounded-lg bg-white/5 border border-border/60 flex justify-between items-center transition-all hover:bg-white/10 opacity-75">
                                         <div className="flex flex-col">
                                             <span className="font-medium text-gray-300">2. Find largest number</span>
                                             <span className="text-xs text-gray-500 mt-1">Comparisons & Jumps</span>
@@ -179,3 +179,4 @@ export default function ProfilePage() {
         </div>
     )
 }
+

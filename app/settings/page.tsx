@@ -18,7 +18,7 @@ export default function SettingsPage() {
     if (!mounted) return null
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+        <div className="min-h-screen bg-background text-white flex flex-col">
             <SimulatorNav />
             <main className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
                 <div className="flex items-center justify-between mb-8">
@@ -29,7 +29,7 @@ export default function SettingsPage() {
                 </div>
 
                 <Tabs defaultValue="general" className="space-y-6">
-                    <TabsList className="bg-white/5 border-white/10 p-1">
+                    <TabsList className="bg-white/5 border-border/60 p-1">
                         <TabsTrigger value="general" className="data-[state=active]:bg-blue-600">General</TabsTrigger>
                         <TabsTrigger value="editor" className="data-[state=active]:bg-blue-600">Editor</TabsTrigger>
                         <TabsTrigger value="simulation" className="data-[state=active]:bg-blue-600">Simulation</TabsTrigger>
@@ -37,7 +37,7 @@ export default function SettingsPage() {
 
                     {/* GENERAL SETTINGS */}
                     <TabsContent value="general" className="space-y-6">
-                        <Card className="bg-[#0a0a0f] border-white/10">
+                        <Card className="bg-background border-border/60">
                             <CardHeader>
                                 <div className="flex items-center gap-2">
                                     <Monitor className="w-5 h-5 text-blue-400" />
@@ -83,7 +83,7 @@ export default function SettingsPage() {
 
                     {/* EDITOR SETTINGS */}
                     <TabsContent value="editor" className="space-y-6">
-                        <Card className="bg-[#0a0a0f] border-white/10">
+                        <Card className="bg-background border-border/60">
                             <CardHeader>
                                 <div className="flex items-center gap-2">
                                     <FileCode className="w-5 h-5 text-purple-400" />
@@ -122,7 +122,7 @@ export default function SettingsPage() {
 
                     {/* SIMULATION SETTINGS */}
                     <TabsContent value="simulation" className="space-y-6">
-                        <Card className="bg-[#0a0a0f] border-white/10">
+                        <Card className="bg-background border-border/60">
                             <CardHeader>
                                 <div className="flex items-center gap-2">
                                     <Cpu className="w-5 h-5 text-emerald-400" />
@@ -137,10 +137,10 @@ export default function SettingsPage() {
                                         value={settings.simulatorSpeed}
                                         onValueChange={(val: any) => updateSettings({ simulatorSpeed: val })}
                                     >
-                                        <SelectTrigger className="bg-white/5 border-white/10">
+                                        <SelectTrigger className="bg-white/5 border-border/60">
                                             <SelectValue placeholder="Select speed" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-[#1a1a24] border-white/10 text-white">
+                                        <SelectContent className="bg-[#1a1a24] border-border/60 text-white">
                                             <SelectItem value="slow">Slow (Debug Mode)</SelectItem>
                                             <SelectItem value="normal">Normal</SelectItem>
                                             <SelectItem value="fast">Instant</SelectItem>
@@ -155,7 +155,7 @@ export default function SettingsPage() {
                                         <Input
                                             value={settings.defaultAddress}
                                             onChange={(e) => updateSettings({ defaultAddress: e.target.value })}
-                                            className="bg-white/5 border-white/10 font-mono"
+                                            className="bg-white/5 border-border/60 font-mono"
                                             maxLength={4}
                                         />
                                     </div>
@@ -166,7 +166,7 @@ export default function SettingsPage() {
                                         <Label className="text-base text-gray-200">Number Format</Label>
                                         <p className="text-sm text-gray-400">Display registers in Hex or Decimal</p>
                                     </div>
-                                    <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/10">
+                                    <div className="flex items-center bg-white/5 rounded-lg p-1 border border-border/60">
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -204,3 +204,4 @@ export default function SettingsPage() {
         </div>
     )
 }
+

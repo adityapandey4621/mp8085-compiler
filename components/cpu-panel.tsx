@@ -65,7 +65,7 @@ export default function CPUPanel({
   return (
     <div className="flex flex-col gap-3">
       {/* Execution Status Strip */}
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0a0a0f] border border-white/5">
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border border-border">
         <div
           className={`w-2 h-2 rounded-full shrink-0 transition-all duration-300 ${
             isRunning
@@ -100,7 +100,7 @@ export default function CPUPanel({
                 className={`p-2 rounded-lg border text-center transition-all duration-300 ${
                   changedRegs.has(reg)
                     ? "bg-blue-500/20 border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.35)]"
-                    : "bg-white/[0.02] border-white/5"
+                    : "bg-muted/50 border-border"
                 }`}
               >
                 <div className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">{reg}</div>
@@ -123,7 +123,7 @@ export default function CPUPanel({
                 className={`p-2.5 rounded-lg border flex items-center justify-between transition-all duration-300 ${
                   changedRegs.has(reg)
                     ? "bg-cyan-500/20 border-cyan-500/50 shadow-[0_0_14px_rgba(6,182,212,0.35)]"
-                    : "bg-white/[0.02] border-white/5"
+                    : "bg-muted/50 border-border"
                 }`}
               >
                 <div className="text-[9px] text-gray-500 uppercase tracking-wider">
@@ -158,7 +158,7 @@ export default function CPUPanel({
                             : "bg-gray-500/20 border-gray-500/30"
                           : value
                           ? "bg-emerald-500/15 border-emerald-500/30"
-                          : "bg-white/[0.02] border-white/5"
+                          : "bg-muted/50 border-border"
                       }`}
                     >
                       <div className="text-[9px] text-gray-500 uppercase tracking-wider mb-1">{flag}</div>
@@ -180,7 +180,7 @@ export default function CPUPanel({
                   </TooltipTrigger>
                   <TooltipContent
                     side="bottom"
-                    className="bg-[#0a0a0f] border-white/10 text-xs max-w-[180px]"
+                    className="bg-background border-border/60 text-xs max-w-[180px]"
                   >
                     {flagDescriptions[flag]}
                   </TooltipContent>
@@ -193,3 +193,4 @@ export default function CPUPanel({
     </div>
   )
 }
+

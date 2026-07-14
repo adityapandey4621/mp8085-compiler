@@ -27,6 +27,7 @@ import { useSimulator } from "@/hooks/use-simulator"
 import { AIAssistantPanel } from "./ai-assistant-panel"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+import { useSettings } from "@/components/settings-provider"
 
 const sampleCode = `; 8085 Assembly Program
 ; Add two numbers
@@ -40,6 +41,12 @@ HLT           ; Halt`
 export default function SimulatorDashboard() {
   const [code, setCode] = useState(sampleCode)
   const { data: session } = useSession()
+  const { showInstructionTrace } = useSettings()
+
+  useEffect(() => {
+    const savedCode = localStorage.getItem("mp8085-autosave-code")
+    if (savedCode) setCode(savedCode)
+  }, [])
 
   const {
     emulatorState,
@@ -196,7 +203,7 @@ export default function SimulatorDashboard() {
   // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+    <div className="min-h-screen bg-background text-white flex flex-col">
       <SimulatorNav />
 
       <main className="flex-1 container mx-auto px-4 py-4 animate-fade-in">
@@ -215,30 +222,34 @@ export default function SimulatorDashboard() {
         />
 
         {/* Main Layout with AI Assistant */}
-        <div className="mt-4 min-h-[calc(100vh-180px)] h-[calc(100vh-180px)] border border-white/5 rounded-lg overflow-hidden">
-          <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+        <div className="mt-4 min-h-[calc(100vh-180px)] h-[calc(100vh-180px)] border border-border rounded-lg overflow-hidden">
+          <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="simulator-main-layout">
             {/* LEFT COLUMN: 30% */}
-            <ResizablePanel defaultSize={30} minSize={20}>
-              <ResizablePanelGroup direction="vertical">
-                <ResizablePanel defaultSize={70}>
+            <ResizablePanel defaultSize={30} minSize={20} id="panel-left" order={1}>
+              <ResizablePanelGroup direction="vertical" autoSaveId="simulator-left-col">
+                <ResizablePanel defaultSize={70} id="panel-editor" order={1}>
                   <div className="h-full p-2">
                     <CodeEditor code={code} setCode={setCode} activeLine={currentLine} />
                   </div>
                 </ResizablePanel>
                 <ResizableHandle className="bg-white/5" />
-                <ResizablePanel defaultSize={30}>
+                <ResizablePanel defaultSize={30} id="panel-console" order={2}>
                   <div className="h-full p-2 pt-0 flex flex-col">
                     <Tabs defaultValue="console" className="flex-1 flex flex-col min-h-0">
-                      <TabsList className="w-full bg-white/5 border border-white/5 mb-2 shrink-0">
+                      <TabsList className="w-full bg-white/5 border border-border mb-2 shrink-0">
                         <TabsTrigger value="console" className="flex-1 text-xs">Console</TabsTrigger>
-                        <TabsTrigger value="history" className="flex-1 text-xs">Instruction History</TabsTrigger>
+                        {showInstructionTrace && (
+                          <TabsTrigger value="history" className="flex-1 text-xs">Instruction History</TabsTrigger>
+                        )}
                       </TabsList>
                       <TabsContent value="console" className="flex-1 min-h-0 m-0 data-[state=active]:flex flex-col">
                         <ConsolePanel logs={consoleOutput} />
                       </TabsContent>
-                      <TabsContent value="history" className="flex-1 min-h-0 m-0 data-[state=active]:flex flex-col">
-                        <InstructionHistory history={instructionHistory} />
-                      </TabsContent>
+                      {showInstructionTrace && (
+                        <TabsContent value="history" className="flex-1 min-h-0 m-0 data-[state=active]:flex flex-col">
+                          <InstructionHistory history={instructionHistory} />
+                        </TabsContent>
+                      )}
                     </Tabs>
                   </div>
                 </ResizablePanel>
@@ -248,7 +259,7 @@ export default function SimulatorDashboard() {
             <ResizableHandle className="bg-white/5" />
 
             {/* MIDDLE COLUMN: 40% */}
-            <ResizablePanel defaultSize={40} minSize={30}>
+            <ResizablePanel defaultSize={40} minSize={30} id="panel-middle" order={2}>
               <div className="h-full p-2 flex flex-col gap-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
                 <div className="shrink-0">
                   <ExecutionState 
@@ -287,7 +298,7 @@ export default function SimulatorDashboard() {
             <ResizableHandle className="bg-white/5" />
 
             {/* RIGHT COLUMN: 30% */}
-            <ResizablePanel defaultSize={30} minSize={20}>
+            <ResizablePanel defaultSize={30} minSize={20} id="panel-right" order={3}>
               <div className="h-full p-2 flex flex-col gap-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
                 <div className="shrink-0">
                   <OutputDisplay ledValue={ledValue} segmentValue={segmentValue} />
@@ -321,8 +332,8 @@ export default function SimulatorDashboard() {
               <Bot className="w-6 h-6 text-white" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[400px] h-[600px] p-0 border-white/10 bg-[#0a0a0f] text-white flex flex-col">
-            <DialogHeader className="p-4 border-b border-white/10 shrink-0">
+          <DialogContent className="max-w-[400px] h-[600px] p-0 border-border/60 bg-background text-white flex flex-col">
+            <DialogHeader className="p-4 border-b border-border/60 shrink-0">
               <DialogTitle>AI Assistant</DialogTitle>
             </DialogHeader>
             <div className="flex-1 overflow-hidden">
@@ -344,3 +355,4 @@ export default function SimulatorDashboard() {
     </div>
   )
 }
+

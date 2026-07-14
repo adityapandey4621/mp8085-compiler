@@ -4,8 +4,10 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { Emulator8085 } from '@/lib/emulator'
 import { Assembler8085 } from '@/lib/assembler'
+import { useSettings } from "@/components/settings-provider"
 
 export function useSimulator() {
+  const { autoReset } = useSettings()
   const emulatorRef = useRef<Emulator8085 | null>(null)
   const assemblerRef = useRef<Assembler8085 | null>(null)
 
@@ -21,6 +23,17 @@ export function useSimulator() {
     '[INFO] 8085 Simulator initialized',
     '[INFO] Ready to load program'
   ])
+
+  const [executionSpeed, _setExecutionSpeed] = useState<number>(0) // 0 = Real-time
+  const executionSpeedRef = useRef<number>(0)
+  const runTimerRef = useRef<number | null>(null)
+  const isRunningRef = useRef<boolean>(false)
+  const lastUiUpdateRef = useRef<number>(0)
+
+  const setExecutionSpeed = useCallback((speed: number) => {
+    _setExecutionSpeed(speed)
+    executionSpeedRef.current = speed
+  }, [])
 
   // Initialize emulator and assembler
   useEffect(() => {
@@ -88,68 +101,148 @@ export function useSimulator() {
     }
   }, [consoleOutput, updateSimulatorState])
 
-  // Run the program
+  // Pause the program
+  const pauseProgram = useCallback(() => {
+    if (runTimerRef.current !== null) {
+      if (executionSpeedRef.current === 0 || executionSpeedRef.current >= 1000) {
+        cancelAnimationFrame(runTimerRef.current)
+      } else {
+        clearTimeout(runTimerRef.current)
+      }
+      runTimerRef.current = null
+    }
+    setIsRunning(false)
+    isRunningRef.current = false
+    setConsoleOutput(prev => [...prev, '[PAUSE] Execution paused'])
+  }, [])
+
+  // Run the program continuously asynchronously
   const runProgram = useCallback(() => {
     if (!isAssembled) {
-      setConsoleOutput([...consoleOutput, '[ERROR] Program not assembled. Please assemble first.'])
+      setConsoleOutput(prev => [...prev, '[ERROR] Program not assembled. Please assemble first.'])
       return
     }
 
     if (!emulatorRef.current) return
 
-    setIsRunning(true)
-    setConsoleOutput([...consoleOutput, '[RUN] Executing program...'])
+    let currentOutput = [...consoleOutput]
+    
+    if (autoReset || emulatorRef.current.getState().halted) {
+      emulatorRef.current.reset()
+      if (assembledCode && assembledCode.machineCode) {
+        emulatorRef.current.loadProgram(assembledCode.machineCode)
+      }
+      updateSimulatorState()
+      setHistory([])
+      setInstructionHistory([])
+      currentOutput.push('[INFO] CPU Reset. Running program...')
+    }
 
-    // Run in a timeout to allow UI to update
-    setTimeout(() => {
+    setIsRunning(true)
+    isRunningRef.current = true
+    currentOutput.push('[RUN] Executing program...')
+    setConsoleOutput(currentOutput)
+
+    // Execute batch loop
+    const executeBatch = () => {
+      if (!isRunningRef.current || !emulatorRef.current) return
+
+      const speed = executionSpeedRef.current
+      let instructionsToRun = 1
+      let totalCycles = 0
+
+      if (speed === 0) {
+        // Real-time (approx 3MHz clock, 400k inst/s). At 60 FPS, that's ~6000 instructions per frame
+        instructionsToRun = 6000
+      } else if (speed >= 1000) {
+        // e.g. 1kHz = 1000 inst/s -> ~16 instructions per frame
+        instructionsToRun = Math.max(1, Math.floor(speed / 60))
+      }
+
       try {
-        const result = emulatorRef.current!.run()
-        const cycles = result.cycles
-        const trace = result.trace
+        let halted = false
+        let bp = false
+        let traceBatch: number[] = []
         
-        if (assembledCode && assembledCode.instructions) {
-          const executedInstructions = trace.map(pc => 
-            assembledCode.instructions.find((i: any) => i.address === pc)
-          ).filter(Boolean);
+        for (let i = 0; i < instructionsToRun; i++) {
+          const stateBefore = emulatorRef.current.getState()
+          traceBatch.push(stateBefore.registers.PC)
           
-          if (executedInstructions.length > 0) {
-            setInstructionHistory(prev => {
-              const newHist = [...prev, ...executedInstructions];
-              return newHist.slice(-50); // Keep last 50
-            });
+          const cycles = emulatorRef.current.step()
+          totalCycles += cycles
+          
+          if (emulatorRef.current.getState().halted) {
+            halted = true
+            break
           }
-          
-          const newPC = emulatorRef.current!.getState().registers.PC;
-          const nextInst = assembledCode.instructions.find((i: any) => i.address === newPC);
-          if (nextInst && !emulatorRef.current!.getState().halted) {
-             setCurrentLine(nextInst.lineNumber);
-          } else {
-             setCurrentLine(null);
+          if (emulatorRef.current.hasBreakpoint()) {
+            bp = true
+            break
           }
         }
         
-        updateSimulatorState()
+        const now = performance.now()
+        // Force update if halted or hit breakpoint, OR if 33ms (~30 FPS) have passed
+        if (halted || bp || now - lastUiUpdateRef.current >= 33) {
+          updateSimulatorState()
+          lastUiUpdateRef.current = now
+        }
 
-        const newConsoleOutput = [
-          ...consoleOutput,
-          `[RUN] Program execution completed in ${cycles} cycles`,
-          emulatorRef.current!.getState().halted
-            ? '[RUN] Program halted'
-            : '[RUN] Execution stopped at breakpoint'
-        ]
+        // Update instruction history and active line efficiently
+        if (assembledCode && assembledCode.instructions && traceBatch.length > 0) {
+          const executedInstructions = traceBatch.map(pc => 
+            assembledCode.instructions.find((i: any) => i.address === pc)
+          ).filter(Boolean)
+          
+          if (executedInstructions.length > 0) {
+            setInstructionHistory(prev => {
+              const newHist = [...prev, ...executedInstructions]
+              return newHist.slice(-50) // Keep last 50
+            })
+          }
+          
+          const newPC = emulatorRef.current.getState().registers.PC
+          const nextInst = assembledCode.instructions.find((i: any) => i.address === newPC)
+          if (nextInst && !emulatorRef.current.getState().halted) {
+             setCurrentLine(nextInst.lineNumber)
+          } else {
+             setCurrentLine(null)
+          }
+        }
 
-        setConsoleOutput(newConsoleOutput)
-        setIsRunning(false)
+        if (halted || bp) {
+          setIsRunning(false)
+          isRunningRef.current = false
+          setConsoleOutput(prev => [
+            ...prev, 
+            halted ? '[RUN] Program halted' : '[RUN] Execution stopped at breakpoint'
+          ])
+          return
+        }
+        
+        // Schedule next batch
+        if (speed === 0 || speed >= 1000) {
+          runTimerRef.current = requestAnimationFrame(executeBatch)
+        } else {
+          const delay = 1000 / speed
+          runTimerRef.current = window.setTimeout(executeBatch, delay)
+        }
+
       } catch (error) {
-        const newConsoleOutput = [
-          ...consoleOutput,
-          `[ERROR] Execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-        ]
-        setConsoleOutput(newConsoleOutput)
         setIsRunning(false)
+        isRunningRef.current = false
+        setConsoleOutput(prev => [...prev, `[ERROR] Execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
       }
-    }, 0)
-  }, [isAssembled, consoleOutput, updateSimulatorState])
+    }
+
+    // Start execution
+    if (executionSpeedRef.current === 0 || executionSpeedRef.current >= 1000) {
+      runTimerRef.current = requestAnimationFrame(executeBatch)
+    } else {
+      runTimerRef.current = window.setTimeout(executeBatch, 1000 / executionSpeedRef.current)
+    }
+
+  }, [isAssembled, assembledCode, consoleOutput, updateSimulatorState])
 
   // Step through one instruction
   const stepProgram = useCallback(() => {
@@ -234,19 +327,29 @@ export function useSimulator() {
 
   // Reset the simulator
   const resetSimulator = useCallback(() => {
+    if (runTimerRef.current !== null) {
+      if (executionSpeedRef.current === 0 || executionSpeedRef.current >= 1000) {
+        cancelAnimationFrame(runTimerRef.current)
+      } else {
+        clearTimeout(runTimerRef.current)
+      }
+      runTimerRef.current = null
+    }
+
     if (!emulatorRef.current) return
 
     emulatorRef.current.reset()
     updateSimulatorState()
 
     setIsRunning(false)
+    isRunningRef.current = false
     setIsAssembled(false)
     setCurrentLine(null)
     setAssembledCode(null)
     setHistory([])
     setInstructionHistory([])
-    setConsoleOutput([...consoleOutput, '[RESET] Simulator reset'])
-  }, [consoleOutput, updateSimulatorState])
+    setConsoleOutput(prev => [...prev, '[RESET] Simulator reset'])
+  }, [updateSimulatorState])
 
   // Clear the code editor
   const clearCode = useCallback(() => {
@@ -296,5 +399,8 @@ export function useSimulator() {
     setBreakpoint,
     setPC,
     addToConsole,
+    executionSpeed,
+    setExecutionSpeed,
+    pauseProgram,
   }
 }
